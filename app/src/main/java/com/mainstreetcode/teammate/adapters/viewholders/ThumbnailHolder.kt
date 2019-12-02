@@ -22,35 +22,10 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.baseclasses
+package com.mainstreetcode.teammate.adapters.viewholders
 
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
+import android.widget.ImageView
 
-abstract class BaseAdapter<VH : BaseViewHolder<*>, T : InteractiveAdapter.AdapterListener> : InteractiveAdapter<VH, T> {
-
-    constructor(adapterListener: T) : super(adapterListener)
-
-    protected constructor() : super()
-
-    protected abstract fun <S : AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S
-
-    override fun onBindViewHolder(holder: VH, position: Int) {
-        val listener = updateListener(holder)
-        holder.updateAdapterListener(listener)
-    }
-
-    override fun onViewRecycled(holder: VH) {
-        holder.clear()
-        super.onViewRecycled(holder)
-    }
-
-    override fun onViewDetachedFromWindow(holder: VH) {
-        holder.onDetached()
-        super.onViewDetachedFromWindow(holder)
-    }
-
-    override fun onFailedToRecycleView(holder: VH): Boolean {
-        holder.clear()
-        return super.onFailedToRecycleView(holder)
-    }
+interface ThumbnailHolder {
+    val thumbnail: ImageView
 }

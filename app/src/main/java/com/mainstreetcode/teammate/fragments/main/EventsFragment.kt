@@ -25,126 +25,122 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
-import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.EventAdapter
+import com.mainstreetcode.teammate.adapters.EventAdapterListener
+import com.mainstreetcode.teammate.adapters.Shell
+import com.mainstreetcode.teammate.adapters.eventAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
-import com.mainstreetcode.teammate.fragments.headless.TeamPickerFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.mainstreetcode.teammate.viewmodel.swap
+import com.tunjid.androidx.core.components.args
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 /**
  * Lists [events][com.mainstreetcode.teammate.model.Event]
  */
 
-class EventsFragment : MainActivityFragment(), EventAdapter.EventAdapterListener {
+class EventsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
+        Shell.TeamAdapterListener,
+        EventAdapterListener {
 
-    private lateinit var team: Team
-    private lateinit var items: List<Differentiable>
+    private var team by args<Team>()
 
-    override val toolbarMenu: Int get() = R.menu.fragment_events
+    private val items: List<Differentiable>
+        get() = eventViewModel.getModelList(team)
 
-    override val fabStringResource: Int @StringRes get() = R.string.event_add
+    override val showsFab: Boolean get() = roleScopeViewModel.hasPrivilegedRole(team)
 
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_add_white_24dp
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        defaultUi(
+                toolBarMenu = R.menu.fragment_events,
+                toolbarTitle = getString(R.string.events_title, team.name),
+                fabText = R.string.event_add,
+                fabIcon = R.drawable.ic_add_white_24dp,
+                fabShows = showsFab
+        )
 
-    override val toolbarTitle: CharSequence get() = getString(R.string.events_title, team.name)
+        val refreshAction = { disposables.add(eventViewModel.refresh(team).subscribe(this@EventsFragment::onEventsUpdated, defaultErrorHandler::invoke)).let { Unit } }
 
-    override val showsFab: Boolean get() = localRoleViewModel.hasPrivilegedRole()
-
-    override fun getStableTag(): String {
-        val superResult = super.getStableTag()
-        val tempTeam = arguments!!.getParcelable<Team>(ARG_TEAM)
-
-        return if (tempTeam != null) superResult + "-" + tempTeam.hashCode()
-        else superResult
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        team = arguments!!.getParcelable(ARG_TEAM)!!
-        items = eventViewModel.getModelList(team)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
-
-        val refreshAction = Runnable { disposables.add(eventViewModel.refresh(team).subscribe(this@EventsFragment::onEventsUpdated, defaultErrorHandler::invoke)) }
-
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.list_layout))
-                .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_event_white_24dp, R.string.no_events))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.list_layout))
+                .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_event_white_24dp, R.string.no_events))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScroll { fetchEvents(false) }
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(EventAdapter(items, this))
+                .withAdapter(eventAdapter(::items, this))
                 .withLinearLayoutManager()
                 .build()
-
-        return rootView
     }
 
     override fun onResume() {
         super.onResume()
-        fetchEvents(true)
-        watchForRoleChanges(team, this::togglePersistentUi)
+
+        watchForRoleChanges(team) { updateUi(fabShows = showsFab) }
+
+        if (teamViewModel.defaultTeam != team) onTeamClicked(teamViewModel.defaultTeam)
+        else fetchEvents(true)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_pick_team -> TeamPickerFragment.change(requireActivity(), R.id.request_event_team_pick).let { true }
+        R.id.action_pick_team -> bottomSheetDriver.showBottomSheet(
+                requestCode = R.id.request_event_team_pick,
+                title = getString(R.string.pick_team),
+                fragment = TeamsFragment.newInstance()
+        ).let { true }
         else -> super.onOptionsItemSelected(item)
     }
 
+    override fun onTeamClicked(item: Team) = disposables.add(teamViewModel.swap(team, item, eventViewModel) {
+        disposables.clear()
+        bottomSheetDriver.hideBottomSheet()
+        watchForRoleChanges(team) { updateUi(fabShows = showsFab) }
+        updateUi(toolbarTitle = getString(R.string.events_title, team.name))
+    }.subscribe(::onEventsUpdated, defaultErrorHandler::invoke)).let { Unit }
+
     override fun onEventClicked(item: Event) {
-        showFragment(EventEditFragment.newInstance(item))
+        navigator.push(EventEditFragment.newInstance(item))
     }
 
     override fun onClick(view: View) {
         when (view.id) {
             R.id.fab -> {
                 val event = Event.empty().apply { updateTeam(teamViewModel.defaultTeam) }
-                showFragment(EventEditFragment.newInstance(event))
+                navigator.push(EventEditFragment.newInstance(event))
             }
         }
     }
 
-    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? = when {
-        fragmentTo.stableTag.contains(EventEditFragment::class.java.simpleName) ->
-            fragmentTo.listDetailTransition(EventEditFragment.ARG_EVENT)
+    override fun augmentTransaction(transaction: FragmentTransaction, incomingFragment: Fragment) = when (incomingFragment) {
+        is EventEditFragment ->
+            transaction.listDetailTransition(EventEditFragment.ARG_EVENT, incomingFragment)
 
-        else -> super.provideFragmentTransaction(fragmentTo)
+        else -> super.augmentTransaction(transaction, incomingFragment)
     }
 
     private fun fetchEvents(fetchLatest: Boolean) {
         if (fetchLatest) scrollManager.setRefreshing()
-        else toggleProgress(true)
+        else transientBarDriver.toggleProgress(true)
 
         disposables.add(eventViewModel.getMany(team, fetchLatest).subscribe(this::onEventsUpdated, defaultErrorHandler::invoke))
     }
 
     private fun onEventsUpdated(result: DiffUtil.DiffResult) {
         scrollManager.onDiff(result)
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
     }
 
     companion object {
-
-        private const val ARG_TEAM = "team"
-
-        fun newInstance(team: Team): EventsFragment = EventsFragment().apply { arguments = bundleOf(ARG_TEAM to team) }
+        fun newInstance(team: Team): EventsFragment = EventsFragment().apply { this.team = team }
     }
 }

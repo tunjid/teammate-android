@@ -26,14 +26,11 @@ package com.mainstreetcode.teammate.repository
 
 
 import com.mainstreetcode.teammate.model.Model
-
-import java.util.Calendar
-import java.util.Date
-
 import io.reactivex.Flowable
 import io.reactivex.Maybe
+import java.util.*
 
- abstract class QueryRepo<T : Model<T>, S : Model<S>, R> : ModelRepo<T>() {
+abstract class QueryRepo<T : Model<T>, S : Model<S>, R> : ModelRepo<T>() {
 
     val futureDate: Date
         get() {
@@ -43,7 +40,8 @@ import io.reactivex.Maybe
         }
 
     fun modelsBefore(key: S, pagination: R?): Flowable<List<T>> =
-            fetchThenGet(localModelsBefore(key, pagination), remoteModelsBefore(key, pagination))
+            if (key.isEmpty) Flowable.just(listOf())
+            else fetchThenGet(localModelsBefore(key, pagination), remoteModelsBefore(key, pagination))
 
     internal abstract fun localModelsBefore(key: S, pagination: R?): Maybe<List<T>>
 

@@ -29,16 +29,15 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.SettingsAdapter
 import com.mainstreetcode.teammate.model.SettingsItem
 import com.mainstreetcode.teammate.util.resolveThemeColor
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 
 class SettingsViewHolder(
         itemView: View,
-        adapterListener: SettingsAdapter.SettingsAdapterListener
-) : InteractiveViewHolder<SettingsAdapter.SettingsAdapterListener>(itemView, adapterListener), View.OnClickListener {
+        val delegate: (SettingsItem) -> Unit
+) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
 
     private lateinit var item: SettingsItem
     private val itemName: TextView = itemView.findViewById(R.id.item_name)
@@ -64,6 +63,6 @@ class SettingsViewHolder(
     }
 
     override fun onClick(view: View) {
-        adapterListener.onSettingsItemClicked(item)
+        delegate.invoke(item)
     }
 }

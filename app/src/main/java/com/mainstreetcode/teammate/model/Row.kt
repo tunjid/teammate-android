@@ -29,7 +29,7 @@ import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.JsonParseException
 import com.mainstreetcode.teammate.util.asStringOrEmpty
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 
 /**
@@ -42,6 +42,9 @@ class Row private constructor(
 ) : Differentiable {
 
     private val tableValues = mutableListOf<String>()
+
+    override val diffId: String
+        get() = id
 
     val imageUrl: String
         get() = competitor.imageUrl
@@ -60,8 +63,6 @@ class Row private constructor(
         tableValues.clear()
         tableValues.addAll(updated.tableValues)
     }
-
-    override fun getId(): String = id
 
     class GsonAdapter : JsonDeserializer<Row> {
 

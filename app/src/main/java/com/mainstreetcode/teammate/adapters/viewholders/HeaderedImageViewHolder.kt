@@ -24,13 +24,12 @@
 
 package com.mainstreetcode.teammate.adapters.viewholders
 
-import android.animation.ArgbEvaluator
-import android.animation.ValueAnimator
-import android.graphics.Color
 import android.view.View
 import android.widget.ImageView
-import androidx.core.content.ContextCompat
-import androidx.core.view.doOnNextLayout
+import androidx.annotation.ColorInt
+import androidx.core.view.doOnLayout
+import androidx.core.view.isVisible
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.model.HeaderedModel
@@ -40,13 +39,13 @@ import com.mainstreetcode.teammate.util.THUMBNAIL_SIZE
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.RequestCreator
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 import java.io.File
 
 class HeaderedImageViewHolder(
         itemView: View,
-        listener: ImageWorkerFragment.ImagePickerListener
-) : InteractiveViewHolder<ImageWorkerFragment.ImagePickerListener>(itemView, listener), View.OnClickListener {
+        private val listener: ImageWorkerFragment.ImagePickerListener,
+        private val animationStarter: () -> Unit
+) : RecyclerView.ViewHolder(itemView),View.OnClickListener{
 
     private val fullRes: ImageView = itemView.findViewById(R.id.image_full_res)
     val thumbnail: ImageView = itemView.findViewById(R.id.image)
@@ -59,7 +58,12 @@ class HeaderedImageViewHolder(
     }
 
     override fun onClick(view: View) {
-        adapterListener.onImageClick()
+        listener.onImageClick()
+    }
+
+    fun onHeaderColorFilterChanged(@ColorInt filterColor: Int) {
+        thumbnail.setColorFilter(filterColor)
+        fullRes.setColorFilter(filterColor)
     }
 
     fun bind(model: HeaderedModel<*>) {
@@ -72,6 +76,7 @@ class HeaderedImageViewHolder(
     fun unBind() = diff.stop()
 
     private fun loadImage(url: String) {
+        fullRes.isVisible = false
         val creator = getCreator(url) ?: return
 
         creator.resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE).centerInside().into(thumbnail)
@@ -86,36 +91,22 @@ class HeaderedImageViewHolder(
         return if (file.exists()) picasso.load(file) else picasso.load(url)
     }
 
-    private fun animateHeader() {
-        val endColor = ContextCompat.getColor(itemView.context, R.color.black_50)
-        val startColor = Color.TRANSPARENT
-
-        val animator = ValueAnimator.ofObject(ArgbEvaluator(), startColor, endColor)
-        animator.duration = 2000
-        animator.addUpdateListener { animation ->
-            val color = animation.animatedValue as? Int ?: return@addUpdateListener
-            thumbnail.setColorFilter(color)
-            fullRes.setColorFilter(color)
-        }
-        animator.start()
-    }
-
     private inner class DeferredImageLoader internal constructor(private val url: String) : Runnable, Callback {
 
         override fun run() {
             val delayed = getCreator(url)
             fullRes.visibility = View.VISIBLE
-            fullRes.doOnNextLayout { delayed?.fit()?.centerCrop()?.into(fullRes, this) }
+            fullRes.doOnLayout { delayed?.fit()?.centerCrop()?.into(fullRes, this) }
         }
 
         override fun onSuccess() {
-            fullRes.visibility = View.VISIBLE
-            animateHeader()
+            fullRes.isVisible = true
+            animationStarter()
         }
 
         override fun onError(e: Exception) {
             diff.restart()
-            animateHeader()
+            animationStarter()
         }
     }
 }

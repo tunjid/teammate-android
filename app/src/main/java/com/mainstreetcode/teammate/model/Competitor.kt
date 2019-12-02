@@ -36,8 +36,12 @@ import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.mainstreetcode.teammate.persistence.entity.CompetitorEntity
-import com.mainstreetcode.teammate.util.*
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.mainstreetcode.teammate.util.areNotEmpty
+import com.mainstreetcode.teammate.util.asBooleanOrFalse
+import com.mainstreetcode.teammate.util.asFloatOrZero
+import com.mainstreetcode.teammate.util.asStringOrEmpty
+import com.mainstreetcode.teammate.util.parseISO8601Date
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 import java.util.*
 
@@ -108,9 +112,9 @@ class Competitor : CompetitorEntity,
     }
 
     override fun areContentsTheSame(other: Differentiable): Boolean {
-        return if (other !is Competitor) id == other.id else entity.javaClass == other.entity.javaClass
+        return if (other !is Competitor) diffId == other.diffId else entity.javaClass == other.entity.javaClass
                 && entity.refType == other.entity.refType
-                && entity.getId() == other.entity.getId()
+                && entity.id == other.entity.id
     }
 
     override fun compareTo(other: Competitor): Int {
@@ -122,7 +126,7 @@ class Competitor : CompetitorEntity,
     class GsonAdapter : JsonSerializer<Competitor>, JsonDeserializer<Competitor> {
 
         override fun serialize(src: Competitor, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
-            if (src.isEmpty) return JsonPrimitive(src.entity.getId())
+            if (src.isEmpty) return JsonPrimitive(src.entity.id)
 
             val json = JsonObject()
             json.addProperty(ACCEPTED, src.isAccepted)

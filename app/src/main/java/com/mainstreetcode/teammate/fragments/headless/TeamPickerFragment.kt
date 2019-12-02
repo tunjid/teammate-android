@@ -29,110 +29,83 @@ import android.os.Bundle
 import androidx.annotation.IdRes
 import androidx.fragment.app.FragmentActivity
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.TeamAdapter
-import com.mainstreetcode.teammate.baseclasses.BottomSheetController
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
-import com.mainstreetcode.teammate.fragments.main.ChatFragment
-import com.mainstreetcode.teammate.fragments.main.EventsFragment
+import com.mainstreetcode.teammate.adapters.Shell
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.fragments.main.GamesFragment
-import com.mainstreetcode.teammate.fragments.main.MediaFragment
-import com.mainstreetcode.teammate.fragments.main.TeamMembersFragment
 import com.mainstreetcode.teammate.fragments.main.TeamsFragment
-import com.mainstreetcode.teammate.fragments.main.TournamentsFragment
 import com.mainstreetcode.teammate.model.Team
+import com.mainstreetcode.teammate.navigation.requestIdToNavIndex
 
-class TeamPickerFragment : MainActivityFragment(), TeamAdapter.AdapterListener {
+class TeamPickerFragment : TeammatesBaseFragment(), Shell.TeamAdapterListener {
 
     @IdRes
     private var requestCode: Int = 0
-    private var isChanging: Boolean = false
 
-    override fun getStableTag(): String = TAG
+    override val stableTag: String
+        get() = TAG
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        isChanging = arguments!!.getBoolean(ARGS_CHANGING)
         requestCode = arguments!!.getInt(ARGS_REQUEST_CODE)
     }
 
     override fun onTeamClicked(item: Team) {
         teamViewModel.updateDefaultTeam(item)
-        when (requestCode) {
-            R.id.request_game_team_pick -> showFragment(GamesFragment.newInstance(item))
-            R.id.request_chat_team_pick -> showFragment(ChatFragment.newInstance(item))
-            R.id.request_event_team_pick -> showFragment(EventsFragment.newInstance(item))
-            R.id.request_media_team_pick -> showFragment(MediaFragment.newInstance(item))
-            R.id.request_tournament_team_pick -> showFragment(TournamentsFragment.newInstance(item))
-            R.id.request_default_team_pick -> showFragment(TeamMembersFragment.newInstance(item))
-        }
-        hideBottomSheet()
+        bottomSheetDriver.hideBottomSheet()
+
+        if (requestCode == R.id.request_game_team_pick) navigator.push(GamesFragment.newInstance(item))
+        else navigator.show(requestCode.requestIdToNavIndex)
     }
 
     private fun pick() {
         val team = teamViewModel.defaultTeam
-        if (!isChanging && !team.isEmpty) onTeamClicked(team)
+        if (!team.isEmpty) onTeamClicked(team)
         else showPicker()
     }
 
-    private fun showPicker() {
-        val teamsFragment = TeamsFragment.newInstance()
-        teamsFragment.setTargetFragment(this, requestCode)
-
-        val menuRes =
-                if (requestCode != R.id.request_event_team_pick || teamViewModel.isOnATeam) R.menu.empty
-                else R.menu.fragment_events_team_pick
-
-        showBottomSheet(BottomSheetController.Args.builder()
-                .setMenuRes(menuRes)
-                .setTitle(getString(R.string.pick_team))
-                .setFragment(teamsFragment)
-                .build())
-    }
+    private fun showPicker() = bottomSheetDriver.showBottomSheet(
+            requestCode = requestCode,
+            menuRes =
+            if (requestCode != R.id.request_event_team_pick || teamViewModel.isOnATeam) R.menu.empty
+            else R.menu.fragment_events_team_pick,
+            title = getString(R.string.pick_team),
+            target = this,
+            fragment = TeamsFragment.newInstance()
+    )
 
     companion object {
 
         private const val TAG = "TeamPickerFragment"
-        private const val ARGS_CHANGING = "ARGS_CHANGING"
         private const val ARGS_REQUEST_CODE = "ARGS_REQUEST_CODE"
 
         fun pick(host: FragmentActivity, @IdRes requestCode: Int) {
-            assureInstance(host, false, requestCode)
+            assureInstance(host, requestCode)
 
-            val instance = getInstance(host, false, requestCode) ?: return
-
-            instance.pick()
-        }
-
-        fun change(host: FragmentActivity, @IdRes requestCode: Int) {
-            assureInstance(host, true, requestCode)
-
-            val instance = getInstance(host, true, requestCode) ?: return
+            val instance = getInstance(host, requestCode) ?: return
 
             instance.pick()
         }
 
-        private fun newInstance(isChanging: Boolean, @IdRes requestCode: Int): TeamPickerFragment {
+        private fun newInstance(@IdRes requestCode: Int): TeamPickerFragment {
             val fragment = TeamPickerFragment()
             val args = Bundle()
-            args.putBoolean(ARGS_CHANGING, isChanging)
             args.putInt(ARGS_REQUEST_CODE, requestCode)
             fragment.arguments = args
             return fragment
         }
 
-        private fun assureInstance(host: FragmentActivity, isChanging: Boolean, @IdRes requestCode: Int) {
+        private fun assureInstance(host: FragmentActivity, @IdRes requestCode: Int) {
             val fragmentManager = host.supportFragmentManager
-            val instance = getInstance(host, isChanging, requestCode)
+            val instance = getInstance(host, requestCode)
 
             if (instance == null) fragmentManager.beginTransaction()
-                    .add(newInstance(isChanging, requestCode), makeTag(isChanging, requestCode))
+                    .add(newInstance(requestCode), makeTag(requestCode))
                     .commitNow()
         }
 
-        private fun getInstance(host: FragmentActivity, isChanging: Boolean, @IdRes requestCode: Int): TeamPickerFragment? =
-                host.supportFragmentManager.findFragmentByTag(makeTag(isChanging, requestCode)) as TeamPickerFragment?
+        private fun getInstance(host: FragmentActivity, @IdRes requestCode: Int): TeamPickerFragment? =
+                host.supportFragmentManager.findFragmentByTag(makeTag(requestCode)) as TeamPickerFragment?
 
-        private fun makeTag(isChanging: Boolean, @IdRes requestCode: Int): String =
-                "$TAG-$isChanging-$requestCode"
+        private fun makeTag(@IdRes requestCode: Int): String = "$TAG-$requestCode"
     }
 }

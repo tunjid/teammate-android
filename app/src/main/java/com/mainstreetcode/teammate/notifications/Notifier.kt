@@ -43,6 +43,7 @@ import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import com.mainstreetcode.teammate.App
 import com.mainstreetcode.teammate.R
+import com.mainstreetcode.teammate.activities.FEED_DEEP_LINK
 import com.mainstreetcode.teammate.activities.MainActivity
 import com.mainstreetcode.teammate.model.Model
 import com.mainstreetcode.teammate.repository.ModelRepo
@@ -104,7 +105,7 @@ abstract class Notifier<T : Model<T>> {
     internal fun getDeepLinkIntent(model: T): PendingIntent {
         val intent = Intent(app, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        intent.putExtra(MainActivity.FEED_DEEP_LINK, model)
+        intent.putExtra(FEED_DEEP_LINK, model)
         addNotificationId(intent)
 
         return getActivity(app, DEEP_LINK_REQ_CODE, intent, FLAG_ONE_SHOT)

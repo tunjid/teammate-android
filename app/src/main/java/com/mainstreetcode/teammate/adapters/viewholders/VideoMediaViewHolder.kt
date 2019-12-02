@@ -36,15 +36,15 @@ import androidx.transition.Fade
 import androidx.transition.TransitionManager
 import com.devbrackets.android.exomedia.ui.widget.VideoView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.MediaAdapter
+import com.mainstreetcode.teammate.adapters.MediaAdapterListener
 import com.mainstreetcode.teammate.model.Media
 
 
 class VideoMediaViewHolder @SuppressLint("ClickableViewAccessibility")
 constructor(
         itemView: View,
-        adapterListener: MediaAdapter.MediaAdapterListener
-) : MediaViewHolder<VideoView>(itemView, adapterListener) {
+        delegate: MediaAdapterListener
+) : MediaViewHolder<VideoView>(itemView, delegate) {
 
     override val thumbnailId: Int
         get() = R.id.thumbnail
@@ -55,7 +55,7 @@ constructor(
     init {
         fullResView.setOnTouchListener(TouchListener(itemView.context))
 
-        if (adapterListener.isFullScreen) {
+        if (delegate.isFullScreen) {
             val params = fullResView.findViewById<View>(R.id.exomedia_video_view).layoutParams as RelativeLayout.LayoutParams
             params.addRule(RelativeLayout.ALIGN_PARENT_TOP)
             params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
@@ -72,7 +72,7 @@ constructor(
             }
         } else {
             fullResView.visibility = View.GONE
-            itemView.setOnClickListener { adapterListener.onMediaClicked(media) }
+            itemView.setOnClickListener { delegate.onMediaClicked(media) }
         }
     }
 
@@ -117,7 +117,7 @@ constructor(
             if (videoControls != null && videoControls.isVisible) videoControls.hide(false)
             else fullResView.showControls()
 
-            adapterListener.onMediaClicked(media)
+            delegate.onMediaClicked(media)
             return true
         }
     }

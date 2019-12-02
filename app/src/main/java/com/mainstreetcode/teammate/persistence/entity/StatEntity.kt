@@ -58,7 +58,7 @@ open class StatEntity : Parcelable {
     @NonNull
     @PrimaryKey
     @ColumnInfo(name = "stat_id")
-    private var id: String
+    var id: String
 
     @ColumnInfo(name = "stat_created")
     var created: Date
@@ -133,11 +133,9 @@ open class StatEntity : Parcelable {
         this.attributes = StatAttributes()
     }
 
-    fun getId(): String = id
+    
 
-    protected fun setId(id: String) {
-        this.id = id
-    }
+    
 
     fun contains(attribute: StatAttribute): Boolean = attributes.contains(attribute)
 

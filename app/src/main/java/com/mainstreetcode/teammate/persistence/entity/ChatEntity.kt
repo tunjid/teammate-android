@@ -48,7 +48,7 @@ open class ChatEntity : Parcelable {
 
     @PrimaryKey
     @ColumnInfo(name = "team_chat_id")
-    var hiddenId: String
+    var id: String
         protected set
 
     @ColumnInfo(name = "team_chat_kind")
@@ -72,10 +72,10 @@ open class ChatEntity : Parcelable {
     var created: Date
         protected set
 
-    constructor(hiddenId: String, kind: String,
+    constructor(id: String, kind: String,
                 content: CharSequence,
                 user: User, hiddenTeam: Team, created: Date) {
-        this.hiddenId = hiddenId
+        this.id = id
         this.content = content
         this.kind = kind
         this.user = user
@@ -84,7 +84,7 @@ open class ChatEntity : Parcelable {
     }
 
     constructor(`in`: Parcel) {
-        hiddenId = `in`.readString()!!
+        id = `in`.readString()!!
         kind = `in`.readString()!!
         content = `in`.readString()!!
         user = `in`.readValue(User::class.java.classLoader) as User
@@ -99,15 +99,15 @@ open class ChatEntity : Parcelable {
 
         val chat = other as ChatEntity?
 
-        return hiddenId == chat?.hiddenId
+        return id == chat?.id
     }
 
-    override fun hashCode(): Int = hiddenId.hashCode()
+    override fun hashCode(): Int = id.hashCode()
 
     override fun describeContents(): Int = 0
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeString(hiddenId)
+        dest.writeString(id)
         dest.writeString(kind)
         dest.writeString(content.toString())
         dest.writeValue(user)

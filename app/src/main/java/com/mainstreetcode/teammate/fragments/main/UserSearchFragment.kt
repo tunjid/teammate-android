@@ -26,45 +26,43 @@ package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
 import android.text.TextUtils
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.UserAdapter
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.adapters.Shell
+import com.mainstreetcode.teammate.adapters.userAdapter
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.InstantSearch
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
 
 /**
  * Searches for users
  */
 
-class UserSearchFragment : MainActivityFragment(), View.OnClickListener, SearchView.OnQueryTextListener, UserAdapter.AdapterListener {
+class UserSearchFragment : TeammatesBaseFragment(R.layout.fragment_user_search),
+        SearchView.OnQueryTextListener,
+        Shell.UserAdapterListener {
 
     private var searchView: SearchView? = null
     private lateinit var instantSearch: InstantSearch<String, User>
-
-    override val staticViews: IntArray get() = EXCLUDED_VIEWS
-
-    override val showsFab: Boolean get() = false
-
-    override val showsToolBar: Boolean get() = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         instantSearch = userViewModel.instantSearch()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_user_search, container, false)
-        searchView = root.findViewById(R.id.searchView)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        defaultUi(
+                toolbarShows = false
+        )
+        searchView = view.findViewById(R.id.searchView)
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(root.findViewById(R.id.list_layout))
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.list_layout))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(UserAdapter(instantSearch.currentItems, this))
+                .withAdapter(userAdapter(instantSearch::currentItems, this))
                 .withGridLayoutManager(2)
                 .build()
 
@@ -80,8 +78,6 @@ class UserSearchFragment : MainActivityFragment(), View.OnClickListener, SearchV
                 addAll(teamMemberViewModel.allUsers)
             }
         }
-
-        return root
     }
 
     override fun onResume() {
@@ -97,10 +93,10 @@ class UserSearchFragment : MainActivityFragment(), View.OnClickListener, SearchV
 
     override fun onUserClicked(item: User) {
         val target = targetFragment
-        val canPick = target is UserAdapter.AdapterListener
+        val canPick = target is Shell.UserAdapterListener
 
-        if (canPick) (target as UserAdapter.AdapterListener).onUserClicked(item)
-        else showFragment(UserEditFragment.newInstance(item))
+        if (canPick) (target as Shell.UserAdapterListener).onUserClicked(item)
+        else navigator.push(UserEditFragment.newInstance(item))
     }
 
     override fun onQueryTextSubmit(s: String): Boolean = false
@@ -117,9 +113,6 @@ class UserSearchFragment : MainActivityFragment(), View.OnClickListener, SearchV
     }
 
     companion object {
-
-        private val EXCLUDED_VIEWS = intArrayOf(R.id.list_layout)
-
         fun newInstance(): UserSearchFragment = UserSearchFragment().apply { arguments = Bundle() }
     }
 }

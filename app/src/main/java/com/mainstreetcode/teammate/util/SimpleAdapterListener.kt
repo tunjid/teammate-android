@@ -25,9 +25,7 @@
 package com.mainstreetcode.teammate.util
 
 
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
-
-interface SimpleAdapterListener<T> : InteractiveAdapter.AdapterListener {
+interface SimpleAdapterListener<T> {
     fun onItemClicked(item: T)
 }
 

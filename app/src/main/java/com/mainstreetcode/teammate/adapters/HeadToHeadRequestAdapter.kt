@@ -25,18 +25,15 @@
 package com.mainstreetcode.teammate.adapters
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.CompetitorViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.input.DateTextInputStyle
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.input.SpinnerTextInputStyle
 import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle
-import com.mainstreetcode.teammate.baseclasses.BaseAdapter
-import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
-import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Config
-import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.HeadToHead
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.alwaysEnabled
@@ -46,101 +43,87 @@ import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.AWAY
 import com.mainstreetcode.teammate.util.HOME
 import com.mainstreetcode.teammate.util.ITEM
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.recyclerview.adapterOf
+import com.tunjid.androidx.recyclerview.diff.Differentiable
+import com.tunjid.androidx.view.util.inflate
 import java.util.*
 
-/**
- * Adapter for [Event]
- */
+interface HeadToHeadAdapterListener {
+    fun onHomeClicked(home: Competitor)
 
-class HeadToHeadRequestAdapter(
-        private val request: HeadToHead.Request,
-        listener: AdapterListener
-) : BaseAdapter<BaseViewHolder<*>, HeadToHeadRequestAdapter.AdapterListener>(listener) {
+    fun onAwayClicked(away: Competitor)
+}
 
-    private val chooser: Chooser
+fun headToHeadRequestAdapter(
+        request: HeadToHead.Request,
+        listener: HeadToHeadAdapterListener
+): RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    val chooser = HeadToHeadChooser()
+
+    return adapterOf<Differentiable, RecyclerView.ViewHolder>(
+            itemsSource = request::items,
+            viewHolderCreator = { viewGroup: ViewGroup, viewType: Int ->
+                when (viewType) {
+                    ITEM -> InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
+                    HOME -> CompetitorViewHolder(viewGroup.inflate(R.layout.viewholder_competitor), listener::onHomeClicked)
+                            .hideSubtitle().withTitle(R.string.pick_home_competitor)
+                    AWAY -> CompetitorViewHolder(viewGroup.inflate(R.layout.viewholder_competitor), listener::onAwayClicked)
+                            .hideSubtitle().withTitle(R.string.pick_away_competitor)
+                    else -> InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
+                }
+            },
+            viewHolderBinder = { holder, item, _ ->
+                when {
+                    item is Item && holder is InputViewHolder -> holder.bind(chooser[item])
+                    item is Competitor && holder is CompetitorViewHolder -> holder.bind(item)
+                }
+            },
+            viewTypeFunction = {
+                when {
+                    it is Item -> ITEM
+                    it is Competitor && it.entity.id == request.homeId -> HOME
+                    else -> AWAY
+                }
+            },
+            itemIdFunction = { it.diffId.hashCode().toLong() },
+            onViewHolderRecycled = { if (it is InputViewHolder) it.clear() },
+            onViewHolderDetached = { if (it is InputViewHolder) it.onDetached() },
+            onViewHolderRecycleFailed = { if (it is InputViewHolder) it.clear(); false }
+    )
+}
+
+private class HeadToHeadChooser internal constructor() : TextInputStyle.InputChooser() {
+
+    private val sports: MutableList<Sport>
 
     init {
-        chooser = Chooser()
+        sports = ArrayList(Config.getSports())
+        sports.add(0, Sport.empty())
     }
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): BaseViewHolder<*> {
-        return when (viewType) {
-            ITEM -> InputViewHolder<ImageWorkerFragment.ImagePickerListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
-            HOME -> CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), CompetitorAdapter.AdapterListener.asSAM(adapterListener::onHomeClicked))
-                    .hideSubtitle().withTitle(R.string.pick_home_competitor)
-            AWAY -> CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), CompetitorAdapter.AdapterListener.asSAM(adapterListener::onAwayClicked))
-                    .hideSubtitle().withTitle(R.string.pick_away_competitor)
-            else -> InputViewHolder<ImageWorkerFragment.ImagePickerListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
-        }
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <S : InteractiveAdapter.AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S {
-        return when {
-            viewHolder.itemViewType == HOME -> CompetitorAdapter.AdapterListener.asSAM(adapterListener::onHomeClicked) as S
-            viewHolder.itemViewType == AWAY -> CompetitorAdapter.AdapterListener.asSAM(adapterListener::onAwayClicked) as S
-            else -> adapterListener as S
-        }
-    }
-
-    override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
-        super.onBindViewHolder(holder, position)
-        when (val identifiable = request.items[position]) {
-            is Item -> (holder as InputViewHolder<*>).bind(chooser[identifiable])
-            is Competitor -> (holder as CompetitorViewHolder).bind(identifiable)
-        }
-    }
-
-    override fun getItemCount(): Int = request.items.size
-
-    override fun getItemViewType(position: Int): Int {
-        val identifiable = request.items[position]
-        return when {
-            identifiable is Item -> ITEM
-            position == 2 -> HOME
-            else -> AWAY
-        }
-    }
-
-    interface AdapterListener : InteractiveAdapter.AdapterListener {
-        fun onHomeClicked(home: Competitor)
-
-        fun onAwayClicked(away: Competitor)
-    }
-
-    private class Chooser internal constructor() : TextInputStyle.InputChooser() {
-
-        private val sports: MutableList<Sport>
-
-        init {
-            sports = ArrayList(Config.getSports())
-            sports.add(0, Sport.empty())
-        }
-
-        override fun invoke(item: Item): TextInputStyle = when (item.itemType) {
-            Item.SPORT -> SpinnerTextInputStyle(
-                    R.string.choose_sport,
-                    sports,
-                    Sport::name,
-                    Sport::code,
-                    Item::alwaysEnabled,
-                    Item::noInputValidation)
-            Item.DATE -> DateTextInputStyle(Item::alwaysEnabled)
-            Item.TOURNAMENT_TYPE -> SpinnerTextInputStyle(
-                    R.string.tournament_type,
-                    Config.getTournamentTypes { true },
-                    TournamentType::name,
-                    TournamentType::code,
-                    Item::alwaysEnabled,
-                    Item::noInputValidation)
-            else -> SpinnerTextInputStyle(
-                    R.string.choose_sport,
-                    sports,
-                    Sport::name,
-                    Sport::code,
-                    Item::alwaysEnabled,
-                    Item::noInputValidation)
-        }
+    override fun invoke(item: Item): TextInputStyle = when (item.itemType) {
+        Item.SPORT -> SpinnerTextInputStyle(
+                R.string.choose_sport,
+                sports,
+                Sport::name,
+                Sport::code,
+                Item::alwaysEnabled,
+                Item::noInputValidation)
+        Item.DATE -> DateTextInputStyle(Item::alwaysEnabled)
+        Item.TOURNAMENT_TYPE -> SpinnerTextInputStyle(
+                R.string.tournament_type,
+                Config.getTournamentTypes { true },
+                TournamentType::name,
+                TournamentType::code,
+                Item::alwaysEnabled,
+                Item::noInputValidation)
+        else -> SpinnerTextInputStyle(
+                R.string.choose_sport,
+                sports,
+                Sport::name,
+                Sport::code,
+                Item::alwaysEnabled,
+                Item::noInputValidation)
     }
 }

@@ -25,39 +25,26 @@
 package com.mainstreetcode.teammate.adapters
 
 import android.view.ViewGroup
-
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.RemoteImageViewHolder
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.RemoteImage
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.recyclerview.adapterOf
+import com.tunjid.androidx.view.util.inflate
 
 /**
  * Adapter for [Event]
  */
 
-class RemoteImageAdapter<T : RemoteImage>(
-        private val items: List<T>,
-        listener: AdapterListener<T>
-) : InteractiveAdapter<RemoteImageViewHolder<T>, RemoteImageAdapter.AdapterListener<T>>(listener) {
-
-    init {
-        setHasStableIds(true)
-    }
-
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): RemoteImageViewHolder<T> =
-            RemoteImageViewHolder(getItemView(R.layout.bottom_nav_item, viewGroup), adapterListener)
-
-    override fun onBindViewHolder(viewHolder: RemoteImageViewHolder<T>, position: Int) {
-        viewHolder.bind(items[position])
-    }
-
-    override fun getItemCount(): Int = items.size
-
-    override fun getItemId(position: Int): Long = items[position].hashCode().toLong()
-
-    interface AdapterListener<T : RemoteImage> : InteractiveAdapter.AdapterListener {
-        fun onImageClicked(item: T)
-    }
-
-}
+fun <T : RemoteImage> remoteImageAdapter(
+        modelSource: () -> List<T>,
+        listener: (T) -> Unit
+): RecyclerView.Adapter<RemoteImageViewHolder<T>> = adapterOf(
+        itemsSource = modelSource,
+        viewHolderCreator = { viewGroup: ViewGroup, _: Int ->
+            RemoteImageViewHolder(viewGroup.inflate(R.layout.bottom_nav_item), listener)
+        },
+        viewHolderBinder = { holder, item, _ -> holder.bind(item) },
+        itemIdFunction = { it.hashCode().toLong() }
+)

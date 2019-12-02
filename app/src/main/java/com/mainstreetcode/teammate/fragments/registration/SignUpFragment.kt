@@ -28,100 +28,78 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.text.SpannableString
-import android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-import android.text.TextPaint
 import android.text.method.LinkMovementMethod
-import android.text.style.ClickableSpan
 import android.view.KeyEvent
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.CheckBox
-import android.widget.EditText
 import android.widget.TextView
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
-import androidx.core.view.ViewCompat
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.activities.RegistrationActivity
-import com.mainstreetcode.teammate.baseclasses.RegistrationActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
+import com.mainstreetcode.teammate.databinding.FragmentSignUpBinding
 import com.mainstreetcode.teammate.rest.TeammateService
 import com.mainstreetcode.teammate.util.ErrorHandler
-import com.mainstreetcode.teammate.util.hasValidName
 import com.mainstreetcode.teammate.util.hasValidEmail
+import com.mainstreetcode.teammate.util.hasValidName
 import com.mainstreetcode.teammate.util.hasValidPassword
-import com.tunjid.androidbootstrap.core.text.SpanBuilder
+import com.mainstreetcode.teammate.util.input
+import com.tunjid.androidx.core.text.click
+import com.tunjid.androidx.core.text.formatSpanned
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 import java.util.concurrent.TimeUnit
 
 
-class SignUpFragment : RegistrationActivityFragment(), TextView.OnEditorActionListener {
+class SignUpFragment : TeammatesBaseFragment(R.layout.fragment_sign_up), TextView.OnEditorActionListener {
 
-    private var firstNameInput: EditText? = null
-    private var lastNameInput: EditText? = null
-    private var emailInput: EditText? = null
-    private var passwordInput: EditText? = null
-    private var terms: CheckBox? = null
-
-    override val fabStringResource: Int
-        @StringRes
-        get() = R.string.submit
-
-    override val fabIconResource: Int
-        @DrawableRes
-        get() = R.drawable.ic_check_white_24dp
-
-    override val toolbarTitle: CharSequence
-        get() = getString(R.string.sign_up)
+    private var binding: FragmentSignUpBinding? = null
 
     private val termsCharSequence: CharSequence
-        get() = SpanBuilder.format(getString(R.string.sign_up_terms_phrase),
-                clickableSpan(getString(R.string.sign_up_terms)) { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(TeammateService.API_BASE_URL + "terms"))) },
-                clickableSpan(getString(R.string.sign_up_privacy_policy)) { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(TeammateService.API_BASE_URL + "privacy"))) })
+        get() = getString(R.string.sign_up_terms_phrase).formatSpanned(
+                getString(R.string.sign_up_terms).termsSpan { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(TeammateService.API_BASE_URL + "terms"))) },
+                getString(R.string.sign_up_privacy_policy).termsSpan { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(TeammateService.API_BASE_URL + "privacy"))) }
+        )
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_sign_up, container, false)
-        val border = rootView.findViewById<View>(R.id.card_view_wrapper)
-        firstNameInput = rootView.findViewById(R.id.first_name)
-        lastNameInput = rootView.findViewById(R.id.last_name)
-        emailInput = rootView.findViewById(R.id.email)
-        passwordInput = rootView.findViewById(R.id.password)
-        terms = rootView.findViewById(R.id.terms)
+    override val showsFab: Boolean = true
 
-        passwordInput!!.setOnEditorActionListener(this)
-        terms!!.text = termsCharSequence
-        terms!!.movementMethod = LinkMovementMethod.getInstance()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = FragmentSignUpBinding.bind(view).run {
+        super.onViewCreated(view, savedInstanceState)
+        binding = this
 
-        ViewCompat.setTransitionName(border, SplashFragment.TRANSITION_BACKGROUND)
-        ViewCompat.setTransitionName(rootView.findViewById(R.id.member_info), SplashFragment.TRANSITION_TITLE)
+        defaultUi(
+                fabText = R.string.submit,
+                fabIcon = R.drawable.ic_check_white_24dp,
+                fabShows = true,
+                toolbarTitle = getString(R.string.sign_up),
+                toolbarShows = true,
+                bottomNavShows = false,
+                grassShows = true,
+                navBarColor = GRASS_COLOR
+        )
 
         disposables.add(Completable.timer(200, TimeUnit.MILLISECONDS).observeOn(mainThread()).subscribe({
-            rootView.findViewById<View>(R.id.first_name_wrapper).visibility = View.VISIBLE
-            rootView.findViewById<View>(R.id.last_name_wrapper).visibility = View.VISIBLE
-            rootView.findViewById<View>(R.id.email_wrapper).visibility = View.VISIBLE
-            rootView.findViewById<View>(R.id.password_wrapper).visibility = View.VISIBLE
+            firstNameWrapper.visibility = View.VISIBLE
+            lastNameWrapper.visibility = View.VISIBLE
+            emailWrapper.visibility = View.VISIBLE
+            passwordWrapper.visibility = View.VISIBLE
         }, ErrorHandler.EMPTY::invoke))
 
-        return rootView
+        terms.text = termsCharSequence
+        terms.movementMethod = LinkMovementMethod.getInstance()
+
+        memberInfo.transitionName = SplashFragment.TRANSITION_TITLE
+        cardViewWrapper.transitionName = SplashFragment.TRANSITION_BACKGROUND
+
+        password.setOnEditorActionListener(this@SignUpFragment)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        firstNameInput = null
-        lastNameInput = null
-        emailInput = null
-        passwordInput = null
+        binding = null
     }
 
-    override val showsFab: Boolean get() = true
-
-    override fun onClick(view: View) {
-        when (view.id) {
-            R.id.fab -> signUp()
-        }
+    override fun onClick(view: View) = when (view.id) {
+        R.id.fab -> signUp()
+        else -> Unit
     }
 
     override fun onEditorAction(textView: TextView, actionId: Int, event: KeyEvent): Boolean = when {
@@ -130,58 +108,47 @@ class SignUpFragment : RegistrationActivityFragment(), TextView.OnEditorActionLi
     }
 
     private fun signUp() {
-        val hasFirstName = firstNameInput.hasValidName
-        val hasLastName = lastNameInput.hasValidName
-        val hasEmail = emailInput.hasValidEmail
-        val hasPassword = passwordInput.hasValidPassword
-        val acceptedTerms = terms!!.isChecked
+        val binding = this.binding ?: return
+        val hasFirstName = binding.firstName.hasValidName
+        val hasLastName = binding.lastName.hasValidName
+        val hasEmail = binding.email.hasValidEmail
+        val hasPassword = binding.password.hasValidPassword
+        val acceptedTerms = binding.terms.isChecked
 
-        if (!acceptedTerms) showSnackbar(getString(R.string.sign_up_terms_accept))
+        if (acceptedTerms) transientBarDriver.showSnackBar(getString(R.string.sign_up_terms_accept))
 
         if (hasFirstName && hasLastName && hasEmail && hasPassword && acceptedTerms) {
-            val firstName = firstNameInput!!.text.toString()
-            val lastName = lastNameInput!!.text.toString()
-            val email = emailInput!!.text.toString()
-            val password = passwordInput!!.text.toString()
+            val firstName = binding.firstName.input.toString()
+            val lastName = binding.lastName.input.toString()
+            val email = binding.email.input.toString()
+            val password = binding.password.input.toString()
 
-            toggleProgress(true)
+            transientBarDriver.toggleProgress(true)
 
-            disposables.add(viewModel.signUp(firstName, lastName, email, password)
+            disposables.add(userViewModel.signUp(firstName, lastName, email, password)
                     .subscribe({ onSignUp() }, defaultErrorHandler::invoke)
             )
         }
     }
 
     private fun onSignUp() {
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
         hideKeyboard()
-        RegistrationActivity.startMainActivity(activity)
+        navigator.completeSignIn()
     }
 
-    private fun clickableSpan(text: CharSequence, clickAction: () -> Unit): CharSequence {
-        val spannableString = SpannableString(text)
-        val clickableSpan = object : ClickableSpan() {
-            override fun onClick(widget: View) = clickAction.invoke()
-
-            override fun updateDrawState(ds: TextPaint) {
-                ds.color = Color.WHITE
-                ds.isUnderlineText = true
-            }
-        }
-
-        spannableString.setSpan(clickableSpan, 0, spannableString.length, SPAN_EXCLUSIVE_EXCLUSIVE)
-        return spannableString
-    }
+    private fun CharSequence.termsSpan(clickAction: () -> Unit): CharSequence = click(
+                paintConsumer = {
+                    it.color = Color.WHITE
+                    it.isUnderlineText = true
+                },
+                clickAction = clickAction
+        )
 
     companion object {
 
-        fun newInstance(): SignUpFragment {
-            val fragment = SignUpFragment()
-            val args = Bundle()
-
-            fragment.arguments = args
-            fragment.setEnterExitTransitions()
-            return fragment
+        fun newInstance(): SignUpFragment = SignUpFragment().apply {
+            arguments = Bundle()
         }
     }
 }

@@ -28,7 +28,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import androidx.annotation.IdRes
-import com.google.android.material.shape.MaterialShapeDrawable
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.util.setMaterialOverlay
 import kotlin.math.min
@@ -55,9 +54,15 @@ class BottomNav constructor(
         container.setMaterialOverlay()
     }
 
-    fun highlight(@IdRes highlighted: Int) {
-        for (viewHolder in viewHolders)
-            viewHolder.tint(if (viewHolder.itemView.id == highlighted) R.attr.bottom_nav_selected else R.attr.bottom_nav_unselected)
+    fun isSelected(@IdRes id: Int) = viewHolders.map(ViewHolder::itemView).firstOrNull { it.id == id }?.isSelected
+            ?: false
+
+    fun select(@IdRes id: Int) {
+        for (viewHolder in viewHolders) {
+            val selected = viewHolder.itemView.id == id
+            viewHolder.itemView.isSelected = selected
+            viewHolder.tint(if (selected) R.attr.bottom_nav_selected else R.attr.bottom_nav_unselected)
+        }
     }
 
     fun getViewHolder(@IdRes id: Int): ViewHolder? {

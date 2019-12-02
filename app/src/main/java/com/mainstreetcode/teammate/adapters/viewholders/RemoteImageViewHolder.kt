@@ -25,18 +25,16 @@
 package com.mainstreetcode.teammate.adapters.viewholders
 
 import android.view.View
-
-import com.mainstreetcode.teammate.adapters.RemoteImageAdapter
 import com.mainstreetcode.teammate.model.RemoteImage
 
 class RemoteImageViewHolder<T : RemoteImage>(
         itemView: View,
-        adapterListener: RemoteImageAdapter.AdapterListener<T>
-) : ModelCardViewHolder<T, RemoteImageAdapter.AdapterListener<T>>(itemView, adapterListener) {
+        delegate: (T) -> Unit
+) : ModelCardViewHolder<T>(itemView) {
 
     init {
         title.visibility = View.GONE
         subtitle.visibility = View.GONE
-        itemView.setOnClickListener { adapterListener.onImageClicked(model) }
+        itemView.setOnClickListener { delegate.invoke(model) }
     }
 }

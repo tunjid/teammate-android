@@ -41,8 +41,7 @@ import com.mainstreetcode.teammate.model.toMessage
 import com.mainstreetcode.teammate.notifications.NotifierProvider
 import com.mainstreetcode.teammate.util.FunctionalDiff
 import com.mainstreetcode.teammate.util.asDifferentiables
-import com.tunjid.androidbootstrap.functions.collections.Lists.findLast
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import java.util.*
@@ -68,22 +67,28 @@ abstract class MappedViewModel<K, V : Differentiable> internal constructor() : B
             if (fetchLatest) getLatest(key) else getMore(key)
 
     fun getMore(key: K): Flowable<DiffUtil.DiffResult> = FunctionalDiff.of(
-            fetch(key, false).map( ::asDifferentiables),
+            fetch(key, false).map(::asDifferentiables),
             getModelList(key),
             this::preserveList
     )
             .doOnError { throwable -> checkForInvalidKey(throwable, key) }
 
     fun refresh(key: K): Flowable<DiffUtil.DiffResult> = FunctionalDiff.of(
-            fetch(key, true).map( ::asDifferentiables),
+            fetch(key, true).map(::asDifferentiables),
             getModelList(key),
             this::pullToRefresh
     )
             .doOnError { throwable -> checkForInvalidKey(throwable, key) }
             .doOnTerminate { pullToRefreshCount.set(0) }
 
+    fun swap(from: K, to: K): Flowable<DiffUtil.DiffResult> = FunctionalDiff.of(
+            Flowable.fromCallable { getModelList(from) }.map(::asDifferentiables),
+            getModelList(to)
+    ) { _, copiedFrom -> copiedFrom }
+            .concatWith(Flowable.defer { refresh(to) })
+
     private fun getLatest(key: K): Flowable<DiffUtil.DiffResult> = FunctionalDiff.of(
-            fetch(key, true).map( ::asDifferentiables),
+            fetch(key, true).map(::asDifferentiables),
             getModelList(key),
             this::preserveList
     )
@@ -94,15 +99,13 @@ abstract class MappedViewModel<K, V : Differentiable> internal constructor() : B
     fun clearNotifications(key: K) =
             getModelList(key).mapNotNull(this::itemToModel).forEach(this::clearNotification)
 
-    private fun pullToRefresh(source: MutableList<Differentiable>, additions: List<Differentiable>): List<Differentiable> {
-        if (pullToRefreshCount.getAndIncrement() == 0) source.clear()
+    private fun pullToRefresh(source: List<Differentiable>, additions: List<Differentiable>): List<Differentiable> {
+        val next = if (pullToRefreshCount.getAndIncrement() == 0) listOf() else source
 
-        preserveList(source, additions)
-        afterPullToRefreshDiff(source)
-        return source
+        return afterPullToRefreshDiff(preserveList(next, additions))
     }
 
-    internal open fun afterPullToRefreshDiff(source: MutableList<Differentiable>) {}
+    internal open fun afterPullToRefreshDiff(source: List<Differentiable>): List<Differentiable> = source
 
     internal open fun onInvalidKey(key: K) {}
 
@@ -114,20 +117,17 @@ abstract class MappedViewModel<K, V : Differentiable> internal constructor() : B
             if (identifiable is Model<*>) identifiable
             else null
 
-    private fun clearNotification(model: Model<*>?) {
-        if (model == null) return
-
-        when (model) {
-            is User -> NotifierProvider.forModel(User::class.java).clearNotifications(model)
-            is Team -> NotifierProvider.forModel(Team::class.java).clearNotifications(model)
-            is Role -> NotifierProvider.forModel(Role::class.java).clearNotifications(model)
-            is Chat -> NotifierProvider.forModel(Chat::class.java).clearNotifications(model)
-            is Game -> NotifierProvider.forModel(Game::class.java).clearNotifications(model)
-            is Media -> NotifierProvider.forModel(Media::class.java).clearNotifications(model)
-            is Event -> NotifierProvider.forModel(Event::class.java).clearNotifications(model)
-            is Tournament -> NotifierProvider.forModel(Tournament::class.java).clearNotifications(model)
-            is JoinRequest -> NotifierProvider.forModel(JoinRequest::class.java).clearNotifications(model)
-        }
+    private fun clearNotification(model: Model<*>?) = when (model) {
+        is User -> NotifierProvider.forModel(User::class.java).clearNotifications(model)
+        is Team -> NotifierProvider.forModel(Team::class.java).clearNotifications(model)
+        is Role -> NotifierProvider.forModel(Role::class.java).clearNotifications(model)
+        is Chat -> NotifierProvider.forModel(Chat::class.java).clearNotifications(model)
+        is Game -> NotifierProvider.forModel(Game::class.java).clearNotifications(model)
+        is Media -> NotifierProvider.forModel(Media::class.java).clearNotifications(model)
+        is Event -> NotifierProvider.forModel(Event::class.java).clearNotifications(model)
+        is Tournament -> NotifierProvider.forModel(Tournament::class.java).clearNotifications(model)
+        is JoinRequest -> NotifierProvider.forModel(JoinRequest::class.java).clearNotifications(model)
+        else -> Unit
     }
 
     internal fun checkForInvalidObject(throwable: Throwable, model: V, key: K) {
@@ -138,7 +138,7 @@ abstract class MappedViewModel<K, V : Differentiable> internal constructor() : B
     internal open fun getQueryDate(fetchLatest: Boolean, key: K, dateFunction: (V) -> Date): Date? {
         if (fetchLatest) return null
 
-        val value = findLast(getModelList(key), valueClass())
+        val value = getModelList(key).filterIsInstance(valueClass()).lastOrNull()
         return if (value == null) null else dateFunction.invoke(value)
     }
 

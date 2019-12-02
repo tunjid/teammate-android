@@ -25,21 +25,19 @@
 package com.mainstreetcode.teammate.adapters.viewholders
 
 import android.view.View
-
-import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.TeamMemberAdapter
-import com.mainstreetcode.teammate.model.Role
-
 import androidx.core.view.ViewCompat.setTransitionName
+import com.mainstreetcode.teammate.R
+import com.mainstreetcode.teammate.adapters.UserHostListener
+import com.mainstreetcode.teammate.model.Role
 import com.mainstreetcode.teammate.util.getTransitionName
 
 class RoleViewHolder(
         itemView: View,
-        adapterListener: TeamMemberAdapter.UserAdapterListener
-) : ModelCardViewHolder<Role, TeamMemberAdapter.UserAdapterListener>(itemView, adapterListener), View.OnClickListener {
+        delegate: UserHostListener
+) : ModelCardViewHolder<Role>(itemView) {
 
     init {
-        itemView.setOnClickListener(this)
+        itemView.setOnClickListener { delegate.onRoleClicked(model) }
     }
 
     override fun bind(model: Role) {
@@ -52,7 +50,4 @@ class RoleViewHolder(
         setTransitionName(thumbnail, model.getTransitionName(R.id.fragment_header_thumbnail))
     }
 
-    override fun onClick(view: View) {
-        adapterListener.onRoleClicked(model)
-    }
 }

@@ -31,7 +31,7 @@ import com.mainstreetcode.teammate.model.Game
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.FunctionalDiff
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
@@ -94,8 +94,8 @@ class GameGofer(
         return FunctionalDiff.of(source, items, this::preserveItems)
     }
 
-    override fun preserveItems(old: MutableList<Differentiable>, fetched: MutableList<Differentiable>): MutableList<Differentiable> {
-        val result = super.preserveItems(old, fetched)
+    override fun preserveItems(old: List<Differentiable>, fetched: List<Differentiable>): List<Differentiable> {
+        val result = super.preserveItems(old, fetched).toMutableList()
         val iterator = result.iterator()
         val filter = { item: Differentiable -> item is Competitor && item.isEmpty }
 

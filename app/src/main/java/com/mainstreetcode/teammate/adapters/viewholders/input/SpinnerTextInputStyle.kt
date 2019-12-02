@@ -67,16 +67,11 @@ class SpinnerTextInputStyle<T> : TextInputStyle {
         if (!isEditable) return
 
         val sequences = items.map { displayFunction.invoke(it) }
-
-
-        val context = view.context
-        val dialog = AlertDialog.Builder(context)
+        AlertDialog.Builder(view.context)
                 .setTitle(titleRes)
                 .setItems(sequences.toTypedArray()) { _, position -> onItemSelected(sequences, position, items[position]) }
                 .create()
-
-        dialog.setOnDismissListener { onDialogDismissed(context) }
-        dialog.show()
+                .show()
     }
 
     private fun onItemSelected(sequences: List<CharSequence>, position: Int, type: T) {

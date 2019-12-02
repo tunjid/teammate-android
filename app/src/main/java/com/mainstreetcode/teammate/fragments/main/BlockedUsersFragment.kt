@@ -25,45 +25,38 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.BlockedUserAdapter
+import com.mainstreetcode.teammate.adapters.blockedUserAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.BlockedUser
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidbootstrap.core.abstractclasses.BaseFragment
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 /**
  * Lists [events][BlockedUser]
  */
 
-class BlockedUsersFragment : MainActivityFragment(), BlockedUserAdapter.UserAdapterListener {
+class BlockedUsersFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh) {
 
     private lateinit var team: Team
     private lateinit var items: List<Differentiable>
 
-    override val toolbarMenu: Int get() = R.menu.fragment_events
+    override val stableTag: String
+        get() {
+            val superResult = super.stableTag
+            val tempTeam = arguments!!.getParcelable<Team>(ARG_TEAM)
 
-    override val toolbarTitle: CharSequence get() = getString(R.string.blocked_users_title, team.name)
-
-    override val showsFab: Boolean get() = false
-
-    override fun getStableTag(): String {
-        val superResult = super.getStableTag()
-        val tempTeam = arguments!!.getParcelable<Team>(ARG_TEAM)
-
-        return if (tempTeam != null) superResult + "-" + tempTeam.hashCode()
-        else superResult
-    }
+            return if (tempTeam != null) superResult + "-" + tempTeam.hashCode()
+            else superResult
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,25 +64,28 @@ class BlockedUsersFragment : MainActivityFragment(), BlockedUserAdapter.UserAdap
         items = blockedUserViewModel.getModelList(team)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        defaultUi(
+                toolbarTitle = getString(R.string.blocked_users_title, team.name),
+                toolBarMenu = R.menu.fragment_events,
+                fabShows = showsFab
+        )
 
-        val refreshAction = Runnable {
+        val refreshAction = {
             disposables.add(blockedUserViewModel.refresh(team)
-                    .subscribe(this::onBlockedUsersUpdated, defaultErrorHandler::invoke))
+                    .subscribe(this::onBlockedUsersUpdated, defaultErrorHandler::invoke)).let { Unit }
         }
 
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(rootView.findViewById(R.id.list_layout))
-                .withPlaceholder(EmptyViewHolder(rootView, R.drawable.ic_block_white_24dp, R.string.no_blocked_users))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.list_layout))
+                .withPlaceholder(EmptyViewHolder(view, R.drawable.ic_block_white_24dp, R.string.no_blocked_users))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScroll { fetchBlockedUsers(false) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
-                .withAdapter(BlockedUserAdapter(items, this))
+                .withAdapter(blockedUserAdapter(items, this::onBlockedUserClicked))
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withGridLayoutManager(2)
                 .build()
-
-        return rootView
     }
 
     override fun onResume() {
@@ -97,20 +93,20 @@ class BlockedUsersFragment : MainActivityFragment(), BlockedUserAdapter.UserAdap
         fetchBlockedUsers(true)
     }
 
-    override fun onBlockedUserClicked(blockedUser: BlockedUser) {
-        showFragment(BlockedUserViewFragment.newInstance(blockedUser))
+    override fun augmentTransaction(transaction: FragmentTransaction, incomingFragment: Fragment) = when (incomingFragment) {
+        is BlockedUserViewFragment ->
+            transaction.listDetailTransition(BlockedUserViewFragment.ARG_BLOCKED_USER, incomingFragment)
+
+        else -> super.augmentTransaction(transaction, incomingFragment)
     }
 
-    override fun provideFragmentTransaction(fragmentTo: BaseFragment): FragmentTransaction? = when {
-        fragmentTo.stableTag.contains(BlockedUserViewFragment::class.java.simpleName) ->
-            fragmentTo.listDetailTransition(BlockedUserViewFragment.ARG_BLOCKED_USER)
-
-        else -> super.provideFragmentTransaction(fragmentTo)
+    private fun onBlockedUserClicked(blockedUser: BlockedUser) {
+        navigator.push(BlockedUserViewFragment.newInstance(blockedUser))
     }
 
     private fun fetchBlockedUsers(fetchLatest: Boolean) {
         if (fetchLatest) scrollManager.setRefreshing()
-        else toggleProgress(true)
+        else transientBarDriver.toggleProgress(true)
 
         disposables.add(blockedUserViewModel.getMany(team, fetchLatest)
                 .subscribe(this::onBlockedUsersUpdated, defaultErrorHandler::invoke))
@@ -118,7 +114,7 @@ class BlockedUsersFragment : MainActivityFragment(), BlockedUserAdapter.UserAdap
 
     private fun onBlockedUsersUpdated(result: DiffUtil.DiffResult) {
         scrollManager.onDiff(result)
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
     }
 
     companion object {

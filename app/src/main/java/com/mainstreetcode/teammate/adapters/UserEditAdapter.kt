@@ -25,85 +25,75 @@
 package com.mainstreetcode.teammate.adapters
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle
-import com.mainstreetcode.teammate.baseclasses.BaseAdapter
-import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.model.noBlankFields
 import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.model.noSpecialCharacters
-import com.mainstreetcode.teammate.util.ITEM
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.adapterOf
+import com.tunjid.androidx.recyclerview.diff.Differentiable
+import com.tunjid.androidx.view.util.inflate
 
 /**
  * Adapter for [User]
  */
 
-class UserEditAdapter(
-        private val items: List<Differentiable>,
-        listener: AdapterListener
-) : BaseAdapter<InputViewHolder<UserEditAdapter.AdapterListener>, UserEditAdapter.AdapterListener>(listener) {
+interface UserEditAdapterListener : ImageWorkerFragment.ImagePickerListener {
+    fun canEdit(): Boolean
+}
 
-    private val chooser: TextInputStyle.InputChooser
+fun userEditAdapter(
+        modelSource: () -> List<Differentiable>,
+        delegate: UserEditAdapterListener
+): RecyclerView.Adapter<InputViewHolder> {
+    val chooser = UserEditChooser(delegate)
+    return adapterOf(
+            itemsSource = modelSource,
+            viewHolderCreator = { viewGroup: ViewGroup, _: Int ->
+                InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
+            },
+            viewHolderBinder = { holder, item, _ ->
+                if (item is Item) holder.bind(chooser[item])
+            },
+            itemIdFunction = { it.diffId.hashCode().toLong() },
+            onViewHolderRecycled = InputViewHolder::clear,
+            onViewHolderDetached = InputViewHolder::onDetached,
+            onViewHolderRecycleFailed = { it.clear(); false }
+    )
+}
 
-    init {
-        chooser = Chooser(adapterListener)
+private class UserEditChooser internal constructor(
+        private val delegate: UserEditAdapterListener
+) : TextInputStyle.InputChooser() {
+
+    override fun iconGetter(item: Item): Int =
+            if (delegate.canEdit() && item.stringRes == R.string.first_name) R.drawable.ic_picture_white_24dp else 0
+
+    override fun textChecker(item: Item): CharSequence? = when (item.itemType) {
+        Item.INPUT -> item.noBlankFields
+        Item.INFO -> item.noSpecialCharacters
+        Item.ABOUT -> item.noInputValidation
+        else -> item.noBlankFields
     }
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InputViewHolder<AdapterListener> =
-            InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup))
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <S : InteractiveAdapter.AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S =
-            adapterListener as S
-
-    override fun onBindViewHolder(holder: InputViewHolder<AdapterListener>, position: Int) {
-        super.onBindViewHolder(holder, position)
-        val item = items[position]
-        if (item is Item) holder.bind(chooser[item])
-    }
-
-    override fun getItemCount(): Int = items.size
-
-    override fun getItemViewType(position: Int): Int = ITEM
-
-    override fun getItemId(position: Int): Long = items[position].hashCode().toLong()
-
-    interface AdapterListener : ImageWorkerFragment.ImagePickerListener {
-        fun canEdit(): Boolean
-    }
-
-    private class Chooser internal constructor(private val adapterListener: AdapterListener) : TextInputStyle.InputChooser() {
-
-        override fun iconGetter(item: Item): Int =
-                if (adapterListener.canEdit() && item.stringRes == R.string.first_name) R.drawable.ic_picture_white_24dp else 0
-
-        override fun textChecker(item: Item): CharSequence? = when (item.itemType) {
-            Item.INPUT -> item.noBlankFields
-            Item.INFO -> item.noSpecialCharacters
-            Item.ABOUT -> item.noInputValidation
-            else -> item.noBlankFields
-        }
-
-        override fun invoke(item: Item): TextInputStyle = when (item.itemType) {
-            Item.INFO,
-            Item.INPUT,
-            Item.ABOUT -> TextInputStyle(
-                    Item.noClicks,
-                    adapterListener::onImageClick,
-                    { adapterListener.canEdit() },
-                    this::textChecker,
-                    this::iconGetter)
-            else -> TextInputStyle(Item.noClicks,
-                    adapterListener::onImageClick,
-                    { adapterListener.canEdit() },
-                    this::textChecker,
-                    this::iconGetter)
-        }
+    override fun invoke(item: Item): TextInputStyle = when (item.itemType) {
+        Item.INFO,
+        Item.INPUT,
+        Item.ABOUT -> TextInputStyle(
+                Item.noClicks,
+                delegate::onImageClick,
+                { delegate.canEdit() },
+                this::textChecker,
+                this::iconGetter)
+        else -> TextInputStyle(Item.noClicks,
+                delegate::onImageClick,
+                { delegate.canEdit() },
+                this::textChecker,
+                this::iconGetter)
     }
 }

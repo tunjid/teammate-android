@@ -40,9 +40,11 @@
     <!--SigninFragment-->
     <string name="email">Email</string>
     <string name="reset_token">Reset Token</string>
+    <string name="reset_password">Reset Password</string>
     <string name="new_password">New Password</string>
     <string name="password">Password</string>
     <string name="sign_in">Sign In</string>
+    <string name="sign_in_back_to_main">Back to main menu</string>
     <string name="sign_in_forgot_password">Forgot Password?</string>
     <string name="sign_in_error_default">Error signing in, please try again later</string>
     <string name="sign_in_error_invalid_password">Please review your credentials</string>
@@ -233,6 +235,7 @@
 
     <!--TournamentDetailFragment-->
     <string name="tourneys">Tourneys</string>
+    <string name="tournaments_title">%1$s Tournaments</string>
     <string name="tournaments">Tournaments</string>
     <string name="editing_competitors">Editing</string>
     <string name="add_tournament_competitors_prompt">Add Competitors?</string>
@@ -275,6 +278,7 @@
     <string name="accept_competition">Join this competition?</string>
 
     <!--GameFragment-->
+    <string name="games_title">%1$s Games</string>
     <string name="game_event_team_change">You cannot change the team for a game\'s event.</string>
     <string name="no_stats">Keep Score. Earn bragging rights.</string>
     <string name="no_competitor_acceptance">Waiting for all sides to accept to play.</string>

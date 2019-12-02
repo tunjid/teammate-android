@@ -25,16 +25,14 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.os.bundleOf
-
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.StandingsAdapter
+import com.mainstreetcode.teammate.adapters.StandingsAdapterListener
+import com.mainstreetcode.teammate.adapters.standingsAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.StandingRowViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Standings
@@ -47,7 +45,8 @@ import com.mainstreetcode.teammate.util.SyncedScrollView
  * Lists [tournaments][Event]
  */
 
-class StandingsFragment : MainActivityFragment(), StandingsAdapter.AdapterListener {
+class StandingsFragment : TeammatesBaseFragment(R.layout.fragment_standings),
+        StandingsAdapterListener {
 
     private lateinit var tournament: Tournament
     private lateinit var standings: Standings
@@ -56,13 +55,14 @@ class StandingsFragment : MainActivityFragment(), StandingsAdapter.AdapterListen
 
     override val showsFab: Boolean get() = false
 
-    override fun getStableTag(): String {
-        val superResult = super.getStableTag()
-        val tempTournament = arguments!!.getParcelable<Tournament>(ARG_TOURNAMENT)
+    override val stableTag: String
+        get() {
+            val superResult = super.stableTag
+            val tempTournament = arguments!!.getParcelable<Tournament>(ARG_TOURNAMENT)
 
-        return if (tempTournament != null) superResult + "-" + tempTournament.hashCode()
-        else superResult
-    }
+            return if (tempTournament != null) superResult + "-" + tempTournament.hashCode()
+            else superResult
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,18 +70,17 @@ class StandingsFragment : MainActivityFragment(), StandingsAdapter.AdapterListen
         standings = tournamentViewModel.getStandings(tournament)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater.inflate(R.layout.fragment_standings, container, false)
-        val spacerToolbar = rootView.findViewById<View>(R.id.spacer_toolbar)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val spacerToolbar = view.findViewById<View>(R.id.spacer_toolbar)
 
         val refreshAction = { fetchStandings(true) }
 
-        scrollManager = ScrollManager.with<StandingRowViewHolder>(rootView.findViewById(R.id.list_layout))
-                .withPlaceholder(EmptyViewHolder(rootView.findViewById(R.id.empty_container), R.drawable.ic_table_24dp, R.string.tournament_no_standings))
-                .withRefreshLayout(rootView.findViewById(R.id.refresh_layout), refreshAction)
+        scrollManager = ScrollManager.with<StandingRowViewHolder>(view.findViewById(R.id.list_layout))
+                .withPlaceholder(EmptyViewHolder(view.findViewById(R.id.empty_container), R.drawable.ic_table_24dp, R.string.tournament_no_standings))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .withEndlessScroll { fetchStandings(false) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(StandingsAdapter(standings.table, this))
+                .withAdapter(standingsAdapter(standings::table, this))
                 .withLinearLayoutManager()
                 .build()
 
@@ -90,8 +89,6 @@ class StandingsFragment : MainActivityFragment(), StandingsAdapter.AdapterListen
         viewHolder = StandingRowViewHolder(spacerToolbar.findViewById(R.id.item_container), this)
         viewHolder?.thumbnail?.visibility = View.GONE
         viewHolder?.position?.visibility = View.GONE
-
-        return rootView
     }
 
     override fun onResume() {
@@ -105,18 +102,17 @@ class StandingsFragment : MainActivityFragment(), StandingsAdapter.AdapterListen
         syncedScrollManager.clearClients()
     }
 
-
     override fun togglePersistentUi() = Unit /* Do nothing */
 
     override fun addScrollNotifier(notifier: SyncedScrollView) =
             syncedScrollManager.addScrollClient(notifier)
 
     override fun onCompetitorClicked(competitor: Competitor) =
-        showCompetitor(competitor)
+            showCompetitor(competitor)
 
     private fun fetchStandings(isRefreshing: Boolean) {
         if (isRefreshing) scrollManager.setRefreshing()
-        else toggleProgress(true)
+        else transientBarDriver.toggleProgress(true)
 
         disposables.add(tournamentViewModel.fetchStandings(tournament)
                 .subscribe(this::onTournamentsUpdated, defaultErrorHandler::invoke))
@@ -125,8 +121,8 @@ class StandingsFragment : MainActivityFragment(), StandingsAdapter.AdapterListen
     private fun onTournamentsUpdated() {
         scrollManager.notifyDataSetChanged()
         viewHolder?.bindColumns(standings.columnNames)
-        toggleProgress(false)
-        if (!restoredFromBackStack()) syncedScrollManager.jog()
+        transientBarDriver.toggleProgress(false)
+        if (!restoredFromBackStack) syncedScrollManager.jog()
     }
 
     companion object {

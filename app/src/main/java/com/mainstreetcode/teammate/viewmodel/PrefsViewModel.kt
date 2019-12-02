@@ -24,13 +24,16 @@
 
 package com.mainstreetcode.teammate.viewmodel
 
+import android.content.res.Configuration
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.Q
+import android.os.PowerManager
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+import androidx.core.content.getSystemService
 import com.mainstreetcode.teammate.App
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.Prefs
@@ -49,6 +52,20 @@ class PrefsViewModel : BaseViewModel() {
 
     val checkedIndex: Int
         get() = nightModes.indexOf(nightUiMode)
+
+    val isInDarkMode: Boolean
+        get() = when (nightUiMode) {
+            MODE_NIGHT_NO -> false
+            MODE_NIGHT_YES -> true
+            MODE_NIGHT_FOLLOW_SYSTEM -> when (App.instance.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+                Configuration.UI_MODE_NIGHT_NO,
+                Configuration.UI_MODE_NIGHT_UNDEFINED -> false
+                else -> true
+            }
+            MODE_NIGHT_AUTO_BATTERY ->
+                App.instance.getSystemService<PowerManager>()?.isPowerSaveMode ?: false
+            else -> false
+        }
 
     var isOnBoarded: Boolean
         get() = prefs.isOnBoarded

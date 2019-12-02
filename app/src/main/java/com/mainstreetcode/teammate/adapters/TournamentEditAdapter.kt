@@ -25,14 +25,13 @@
 package com.mainstreetcode.teammate.adapters
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.App
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.CompetitorViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.input.SpinnerTextInputStyle
 import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle
-import com.mainstreetcode.teammate.baseclasses.BaseAdapter
-import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Config
@@ -45,129 +44,118 @@ import com.mainstreetcode.teammate.model.noBlankFields
 import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.ITEM
 import com.mainstreetcode.teammate.util.TOURNAMENT
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.adapterOf
+import com.tunjid.androidx.recyclerview.diff.Differentiable
+import com.tunjid.androidx.view.util.inflate
 
-/**
- * Adapter for [com.mainstreetcode.teammate.model.Tournament]
- */
+interface TournamentAdapterListener : ImageWorkerFragment.ImagePickerListener {
 
-class TournamentEditAdapter(
-        private val items: List<Differentiable>,
-        listener: AdapterListener
-) : BaseAdapter<BaseViewHolder<*>, TournamentEditAdapter.AdapterListener>(listener) {
+    val sport: Sport
 
-    private val chooser: TextInputStyle.InputChooser
-    private val listener = CompetitorAdapter.AdapterListener.asSAM { }
+    fun canEditBeforeCreation(): Boolean
 
-    init {
-        chooser = Chooser(adapterListener)
+    fun canEditAfterCreation(): Boolean
+}
+
+fun tournamentEditAdapter(
+        modelSource: () -> List<Differentiable>,
+        delegate: TournamentAdapterListener
+): RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    val chooser = TournamentEditChooser(delegate)
+
+    return adapterOf<Differentiable, RecyclerView.ViewHolder>(
+            itemsSource = modelSource,
+            viewHolderCreator = { viewGroup: ViewGroup, viewType: Int ->
+                when (viewType) {
+                    ITEM -> InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
+                    TOURNAMENT -> CompetitorViewHolder(viewGroup.inflate(R.layout.viewholder_competitor)) {}
+                    else -> InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
+                }
+            },
+            viewHolderBinder = { holder, item, _ ->
+                when {
+                    item is Item && holder is InputViewHolder -> holder.bind(chooser[item])
+                    item is Competitor && holder is CompetitorViewHolder -> holder.bind(item)
+                }
+            },
+            viewTypeFunction = {
+                when (it) {
+                    is Item -> ITEM
+                    else -> TOURNAMENT
+                }
+            },
+            onViewHolderRecycled = { if (it is InputViewHolder) it.clear() },
+            onViewHolderDetached = { if (it is InputViewHolder) it.onDetached() },
+            onViewHolderRecycleFailed = { if (it is InputViewHolder) it.clear(); false }
+    )
+}
+
+private class TournamentEditChooser internal constructor(private val delegate: TournamentAdapterListener) : TextInputStyle.InputChooser() {
+
+    override fun iconGetter(item: Item): Int = when {
+        item.stringRes == R.string.tournament_name && delegate.canEditAfterCreation() -> R.drawable.ic_picture_white_24dp
+        else -> 0
     }
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): BaseViewHolder<*> = when (viewType) {
-        ITEM -> InputViewHolder<AdapterListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
-        TOURNAMENT -> CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), listener)
-        else -> InputViewHolder<AdapterListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
+    override fun enabler(item: Item): Boolean = when (item.itemType) {
+        Item.ABOUT -> item.neverEnabled
+        Item.INFO,
+        Item.INPUT,
+        Item.NUMBER,
+        Item.TOURNAMENT_TYPE,
+        Item.TOURNAMENT_STYLE -> delegate.canEditBeforeCreation()
+        Item.DESCRIPTION -> delegate.canEditAfterCreation()
+        else -> item.neverEnabled
     }
 
-    @Suppress("UNCHECKED_CAST")
-    override fun <S : InteractiveAdapter.AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S =
-            listener as S
-
-    override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
-        super.onBindViewHolder(holder, position)
-
-        when (val item = items[position]) {
-            is Item -> (holder as InputViewHolder<*>).bind(chooser[item])
-            is Competitor -> (holder as CompetitorViewHolder).bind(item)
-        }
+    override fun textChecker(item: Item): CharSequence? = when (item.itemType) {
+        Item.INPUT,
+        Item.NUMBER -> item.noBlankFields
+        Item.INFO,
+        Item.DESCRIPTION,
+        Item.TOURNAMENT_TYPE,
+        Item.TOURNAMENT_STYLE -> item.noInputValidation
+        else -> item.noBlankFields
     }
 
-    override fun getItemCount(): Int {
-        return items.size
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        val thing = items[position]
-        return if (thing is Item) ITEM else TOURNAMENT
-    }
-
-    interface AdapterListener : ImageWorkerFragment.ImagePickerListener {
-
-        val sport: Sport
-
-        fun canEditBeforeCreation(): Boolean
-
-        fun canEditAfterCreation(): Boolean
-    }
-
-    private class Chooser internal constructor(private val adapterListener: AdapterListener) : TextInputStyle.InputChooser() {
-
-        override fun iconGetter(item: Item): Int = when {
-            item.stringRes == R.string.tournament_name && adapterListener.canEditAfterCreation() -> R.drawable.ic_picture_white_24dp
-            else -> 0
-        }
-
-        override fun enabler(item: Item): Boolean = when (item.itemType) {
-            Item.ABOUT -> item.neverEnabled
-            Item.INFO,
-            Item.INPUT,
-            Item.NUMBER,
-            Item.TOURNAMENT_TYPE,
-            Item.TOURNAMENT_STYLE -> adapterListener.canEditBeforeCreation()
-            Item.DESCRIPTION -> adapterListener.canEditAfterCreation()
-            else -> item.neverEnabled
-        }
-
-        override fun textChecker(item: Item): CharSequence? = when (item.itemType) {
-            Item.INPUT,
-            Item.NUMBER -> item.noBlankFields
-            Item.INFO,
-            Item.DESCRIPTION,
-            Item.TOURNAMENT_TYPE,
-            Item.TOURNAMENT_STYLE -> item.noInputValidation
-            else -> item.noBlankFields
-        }
-
-        override fun invoke(item: Item): TextInputStyle = when (item.itemType) {
-            Item.INPUT,
-            Item.NUMBER,
-            Item.DESCRIPTION -> TextInputStyle(
-                    Item.noClicks,
-                    adapterListener::onImageClick,
-                    this::enabler,
-                    this::textChecker,
-                    this::iconGetter)
-            Item.TOURNAMENT_TYPE -> SpinnerTextInputStyle(
-                    R.string.tournament_type,
-                    Config.getTournamentTypes(adapterListener.sport::supportsTournamentType),
-                    TournamentType::name,
-                    TournamentType::code,
+    override fun invoke(item: Item): TextInputStyle = when (item.itemType) {
+        Item.INPUT,
+        Item.NUMBER,
+        Item.DESCRIPTION -> TextInputStyle(
+                Item.noClicks,
+                delegate::onImageClick,
+                this::enabler,
+                this::textChecker,
+                this::iconGetter)
+        Item.TOURNAMENT_TYPE -> SpinnerTextInputStyle(
+                R.string.tournament_type,
+                Config.getTournamentTypes(delegate.sport::supportsTournamentType),
+                TournamentType::name,
+                TournamentType::code,
+                this::enabler,
+                Item::noInputValidation)
+        Item.TOURNAMENT_STYLE -> SpinnerTextInputStyle(
+                R.string.tournament_style,
+                Config.getTournamentStyles(delegate.sport::supportsTournamentStyle),
+                TournamentStyle::name,
+                TournamentStyle::code,
+                this::enabler,
+                Item::noInputValidation)
+        Item.INFO -> {
+            val resources = App.instance.resources
+            SpinnerTextInputStyle(
+                    R.string.tournament_single_final,
+                    listOf(true, false),
+                    { flag -> resources.getString(if (flag) R.string.yes else R.string.no) },
+                    Boolean::toString,
                     this::enabler,
                     Item::noInputValidation)
-            Item.TOURNAMENT_STYLE -> SpinnerTextInputStyle(
-                    R.string.tournament_style,
-                    Config.getTournamentStyles(adapterListener.sport::supportsTournamentStyle),
-                    TournamentStyle::name,
-                    TournamentStyle::code,
-                    this::enabler,
-                    Item::noInputValidation)
-            Item.INFO -> {
-                val resources = App.instance.resources
-                SpinnerTextInputStyle(
-                        R.string.tournament_single_final,
-                        listOf(true, false),
-                        { flag -> resources.getString(if (flag) R.string.yes else R.string.no) },
-                        Boolean::toString,
-                        this::enabler,
-                        Item::noInputValidation)
-            }
-            else -> TextInputStyle(
-                    Item.noClicks,
-                    adapterListener::onImageClick,
-                    this::enabler,
-                    this::textChecker,
-                    this::iconGetter)
         }
+        else -> TextInputStyle(
+                Item.noClicks,
+                delegate::onImageClick,
+                this::enabler,
+                this::textChecker,
+                this::iconGetter)
     }
 }

@@ -31,6 +31,9 @@ import android.os.Parcel
 @SuppressLint("ParcelCreator")
 object ModelStub : UserHost, TeamHost, Model<ModelStub> {
 
+    override val id: String
+        get() = throw UnsupportedOperationException()
+
     override val user: User
         get() = User.empty()
 
@@ -42,8 +45,6 @@ object ModelStub : UserHost, TeamHost, Model<ModelStub> {
 
     override val isEmpty: Boolean
         get() = throw UnsupportedOperationException()
-
-    override fun getId(): String = throw UnsupportedOperationException()
 
     override fun compareTo(other: ModelStub): Int = throw UnsupportedOperationException()
 

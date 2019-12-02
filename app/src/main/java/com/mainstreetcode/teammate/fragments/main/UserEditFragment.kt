@@ -25,46 +25,39 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.DiffUtil
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.UserEditAdapter
+import com.mainstreetcode.teammate.adapters.UserEditAdapterListener
+import com.mainstreetcode.teammate.adapters.userEditAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder
 import com.mainstreetcode.teammate.baseclasses.HeaderedFragment
 import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ScrollManager
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
 import com.mainstreetcode.teammate.viewmodel.gofers.UserGofer
-import com.tunjid.androidbootstrap.view.util.InsetFlags
+import com.tunjid.androidx.view.util.InsetFlags
 
 /**
  * Edits a Team member
  */
 
-class UserEditFragment : HeaderedFragment<User>(), UserEditAdapter.AdapterListener {
+class UserEditFragment : HeaderedFragment<User>(R.layout.fragment_headered),
+        UserEditAdapterListener {
 
     override lateinit var headeredModel: User
         private set
 
     private lateinit var gofer: UserGofer
 
-    override val fabStringResource: Int @StringRes get() = R.string.user_update
-
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_check_white_24dp
-
-    override val toolbarTitle: CharSequence get() = getString(if (canEdit()) R.string.user_edit else R.string.user_info)
+    private val toolbarTitle: CharSequence get() = getString(if (canEdit()) R.string.user_edit else R.string.user_info)
 
     override val insetFlags: InsetFlags get() = NO_TOP
 
     override val showsFab: Boolean get() = canEdit()
 
-    override fun getStableTag(): String =
-            Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_USER)!!)
+    override val stableTag: String get() = Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_USER)!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,21 +65,22 @@ class UserEditFragment : HeaderedFragment<User>(), UserEditAdapter.AdapterListen
         gofer = userViewModel.gofer(headeredModel)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_headered, container, false)
-
-        scrollManager = ScrollManager.with<InputViewHolder<*>>(root.findViewById(R.id.model_list))
-                .withRefreshLayout(root.findViewById(R.id.refresh_layout)) { this.refresh() }
-                .withAdapter(UserEditAdapter(gofer.items, this))
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        defaultUi(
+                toolbarTitle = toolbarTitle,
+                fabIcon = R.drawable.ic_check_white_24dp,
+                fabText = R.string.user_update,
+                fabShows = showsFab
+        )
+        scrollManager = ScrollManager.with<InputViewHolder>(view.findViewById(R.id.model_list))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout)) { this.refresh() }
+                .withAdapter(userEditAdapter(gofer::items, this))
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
                 .withRecycledViewPool(inputRecycledViewPool())
                 .withLinearLayoutManager()
-                .build()
-
-        scrollManager.recyclerView.requestFocus()
-
-        return root
+                .build().apply { recyclerView?.requestFocus() }
     }
 
     override fun gofer(): Gofer<User> = gofer
@@ -94,19 +88,20 @@ class UserEditFragment : HeaderedFragment<User>(), UserEditAdapter.AdapterListen
     override fun canEdit(): Boolean = userViewModel.currentUser == headeredModel
 
     override fun onModelUpdated(result: DiffUtil.DiffResult) {
-        viewHolder.bind(headeredModel)
+        updateUi(toolbarTitle = toolbarTitle)
+        viewHolder?.bind(headeredModel)
         scrollManager.onDiff(result)
-        toggleProgress(false)
+        transientBarDriver.toggleProgress(false)
     }
 
     override fun onClick(view: View) {
         when (view.id) {
             R.id.fab -> {
-                toggleProgress(true)
+                transientBarDriver.toggleProgress(true)
                 disposables.add(gofer.save().subscribe({ result ->
-                    showSnackbar(getString(R.string.updated_user, headeredModel.firstName))
-                    toggleProgress(false)
-                    viewHolder.bind(headeredModel)
+                    transientBarDriver.showSnackBar(getString(R.string.updated_user, headeredModel.firstName))
+                    transientBarDriver.toggleProgress(false)
+                    viewHolder?.bind(headeredModel)
                     scrollManager.onDiff(result)
                 }, defaultErrorHandler::invoke))
             }

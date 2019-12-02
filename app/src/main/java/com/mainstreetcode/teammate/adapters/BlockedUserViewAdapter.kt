@@ -25,58 +25,42 @@
 package com.mainstreetcode.teammate.adapters
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle
-import com.mainstreetcode.teammate.baseclasses.BaseAdapter
-import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.model.BlockedUser
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.neverEnabled
 import com.mainstreetcode.teammate.model.noIcon
 import com.mainstreetcode.teammate.model.noInputValidation
-import com.mainstreetcode.teammate.util.ITEM
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.adapterOf
+import com.tunjid.androidx.recyclerview.diff.Differentiable
+import com.tunjid.androidx.view.util.inflate
 
 /**
  * Adapter for [BlockedUser]
  */
 
-class BlockedUserViewAdapter(private val items: List<Differentiable>) : BaseAdapter<InputViewHolder<*>, InteractiveAdapter.AdapterListener>(object : AdapterListener {
+fun blockedUserViewAdapter(
+        modelSource: () -> List<Differentiable>
+): RecyclerView.Adapter<InputViewHolder> {
+    val chooser = BlockedUserChooser()
+    return adapterOf(
+            itemsSource = modelSource,
+            viewHolderCreator = { viewGroup: ViewGroup, _: Int ->
+                InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
+            },
+            viewHolderBinder = { holder, item, _ -> if (item is Item) holder.bind(chooser[item]) }
+    )
+}
 
-}) {
-    private val chooser: Chooser
-
-    init {
-        chooser = Chooser()
-    }
-
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InputViewHolder<*> =
-            InputViewHolder<Nothing>(getItemView(R.layout.viewholder_simple_input, viewGroup))
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <S : AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S {
-        return adapterListener as S
-    }
-
-    override fun onBindViewHolder(holder: InputViewHolder<*>, position: Int) {
-        super.onBindViewHolder(holder, position)
-        val item = items[position]
-        if (item is Item) holder.bind(chooser[item])
-    }
-
-    override fun getItemCount(): Int = items.size
-
-    override fun getItemViewType(position: Int): Int = ITEM
-
-    private class Chooser : TextInputStyle.InputChooser() {
-        override fun invoke(input: Item): TextInputStyle = TextInputStyle(
-                Item.noClicks,
-                Item.noClicks,
-                Item::neverEnabled,
-                Item::noInputValidation,
-                Item::noIcon
-        )
-    }
+private class BlockedUserChooser : TextInputStyle.InputChooser() {
+    override fun invoke(input: Item): TextInputStyle = TextInputStyle(
+            Item.noClicks,
+            Item.noClicks,
+            Item::neverEnabled,
+            Item::noInputValidation,
+            Item::noIcon
+    )
 }

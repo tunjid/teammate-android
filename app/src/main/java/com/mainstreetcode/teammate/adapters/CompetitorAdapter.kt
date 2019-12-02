@@ -25,48 +25,40 @@
 package com.mainstreetcode.teammate.adapters
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
+import com.mainstreetcode.teammate.adapters.viewholders.AdViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.CompetitorViewHolder
+import com.mainstreetcode.teammate.adapters.viewholders.ContentAdViewHolder
+import com.mainstreetcode.teammate.adapters.viewholders.InstallAdViewHolder
+import com.mainstreetcode.teammate.adapters.viewholders.bind
+import com.mainstreetcode.teammate.model.Ad
 import com.mainstreetcode.teammate.model.Competitor
-import com.mainstreetcode.teammate.model.Item
-import com.mainstreetcode.teammate.model.Team
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.mainstreetcode.teammate.model.Item.Companion.COMPETITOR
+import com.mainstreetcode.teammate.util.CONTENT_AD
+import com.mainstreetcode.teammate.util.INSTALL_AD
+import com.tunjid.androidx.recyclerview.adapterOf
+import com.tunjid.androidx.recyclerview.diff.Differentiable
+import com.tunjid.androidx.view.util.inflate
 
-/**
- * Adapter for [Team]
- */
-
-open class CompetitorAdapter(
-        private val items: List<Differentiable>,
-        listener: AdapterListener
-) : InteractiveAdapter<CompetitorViewHolder, CompetitorAdapter.AdapterListener>(listener) {
-
-    init {
-        setHasStableIds(true)
-    }
-
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): CompetitorViewHolder =
-            CompetitorViewHolder(getItemView(R.layout.viewholder_competitor, viewGroup), adapterListener)
-
-    override fun onBindViewHolder(viewHolder: CompetitorViewHolder, position: Int) {
-        val identifiable = items[position]
-        if (identifiable is Competitor) viewHolder.bind(identifiable)
-    }
-
-    override fun getItemCount(): Int = items.size
-
-    override fun getItemId(position: Int): Long = items[position].hashCode().toLong()
-
-    override fun getItemViewType(position: Int): Int = Item.COMPETITOR
-
-    interface AdapterListener : InteractiveAdapter.AdapterListener {
-        fun onCompetitorClicked(competitor: Competitor)
-
-        companion object {
-            fun asSAM(function: (Competitor) -> Unit) = object : AdapterListener {
-                override fun onCompetitorClicked(competitor: Competitor) = function.invoke(competitor)
+fun competitorAdapter(
+        modelSource: () -> List<Differentiable>,
+        listener: (Competitor) -> Unit
+): RecyclerView.Adapter<RecyclerView.ViewHolder> = adapterOf(
+        itemsSource = modelSource,
+        viewHolderCreator = { viewGroup: ViewGroup, viewType: Int ->
+            when (viewType) {
+                CONTENT_AD -> ContentAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_content_ad), listener)
+                INSTALL_AD -> InstallAdViewHolder(viewGroup.inflate(R.layout.viewholder_grid_install_ad), listener)
+                else -> CompetitorViewHolder(viewGroup.inflate(R.layout.viewholder_competitor), listener)
             }
-        }
-    }
-}
+        },
+        viewHolderBinder = { holder, item, _ ->
+            when {
+                item is Ad<*> && holder is AdViewHolder<*> -> holder.bind(item)
+                item is Competitor && holder is CompetitorViewHolder -> holder.bind(item)
+            }
+        },
+        itemIdFunction = { it.hashCode().toLong() },
+        viewTypeFunction = { (it as? Ad<*>)?.type ?: COMPETITOR }
+)

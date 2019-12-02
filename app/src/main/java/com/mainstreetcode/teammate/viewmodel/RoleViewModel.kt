@@ -34,7 +34,7 @@ import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.repository.RepoProvider
 import com.mainstreetcode.teammate.repository.RoleRepo
 import com.mainstreetcode.teammate.util.ErrorHandler
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 

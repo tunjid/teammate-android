@@ -36,8 +36,9 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.model.enums.StatType
 import com.mainstreetcode.teammate.util.IdCache
-import com.mainstreetcode.teammate.util.*
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.mainstreetcode.teammate.util.asFloatOrZero
+import com.mainstreetcode.teammate.util.asStringOrEmpty
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import java.lang.reflect.Type
 import java.util.*
 
@@ -146,12 +147,13 @@ class StatAggregate {
             private var statType: StatType
     ) : Differentiable {
 
+        override val diffId: String
+            get() = statType.diffId
+
         val count: String
             get() = countValue.toString()
 
         val type: CharSequence
             get() = statType.emojiAndName
-
-        override fun getId(): String = statType.id
     }
 }

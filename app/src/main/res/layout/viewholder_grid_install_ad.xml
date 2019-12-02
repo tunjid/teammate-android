@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ MIT License
   ~
   ~ Copyright (c) 2019 Adetunji Dahunsi
@@ -23,12 +22,20 @@
   ~ SOFTWARE.
   -->
 
-<com.google.android.gms.ads.formats.NativeAppInstallAdView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/half_margin"
-    android:layout_marginLeft="@dimen/half_margin"
-    android:layout_marginRight="@dimen/half_margin"
-    android:layout_marginTop="@dimen/half_margin">
+    xmlns:tools="http://schemas.android.com/tools">
 
-</com.google.android.gms.ads.formats.NativeAppInstallAdView>
+    <com.google.android.gms.ads.formats.NativeAppInstallAdView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/half_margin"
+        android:layout_marginTop="@dimen/half_margin"
+        android:layout_marginRight="@dimen/half_margin"
+        tools:viewBindingIgnore="true"
+        android:layout_marginBottom="@dimen/half_margin">
+
+    </com.google.android.gms.ads.formats.NativeAppInstallAdView>
+
+</FrameLayout>

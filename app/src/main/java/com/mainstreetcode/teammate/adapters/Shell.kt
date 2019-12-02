@@ -22,30 +22,29 @@
  * SOFTWARE.
  */
 
-package com.mainstreetcode.teammate.baseclasses
+package com.mainstreetcode.teammate.adapters
 
-import android.view.View
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-import io.reactivex.disposables.CompositeDisposable
+import com.mainstreetcode.teammate.model.Team
+import com.mainstreetcode.teammate.model.User
 
-open class BaseViewHolder<T : InteractiveAdapter.AdapterListener> : InteractiveViewHolder<T> {
+class Shell {
+    interface TeamAdapterListener {
+        fun onTeamClicked(item: Team)
 
-    protected var disposables = CompositeDisposable()
-
-    constructor(itemView: View) : super(itemView)
-
-    constructor(itemView: View, adapterListener: T) : super(itemView, adapterListener)
-
-    open fun clear() {
-        disposables.clear()
-        adapterListener = null
+        companion object {
+            fun asSAM(function: (Team) -> Unit) = object : TeamAdapterListener {
+                override fun onTeamClicked(item: Team) = function.invoke(item)
+            }
+        }
     }
 
-    open fun onDetached() {}
+    interface UserAdapterListener {
+        fun onUserClicked(item: User)
 
-    @Suppress("UNCHECKED_CAST")
-    internal inline fun <reified R>  updateAdapterListener(adapterListener: R) {
-        this.adapterListener = adapterListener as T
+        companion object {
+            fun asSAM(function: (User) -> Unit) = object : UserAdapterListener {
+                override fun onUserClicked(item: User) = function.invoke(item)
+            }
+        }
     }
 }

@@ -26,9 +26,7 @@ package com.mainstreetcode.teammate.adapters.viewholders
 
 import android.annotation.SuppressLint
 import android.view.View
-
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.CompetitorAdapter
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Team
 
@@ -36,13 +34,16 @@ import com.mainstreetcode.teammate.model.Team
  * Viewholder for a [Team]
  */
 class CompetitorViewHolder @SuppressLint("ClickableViewAccessibility")
-constructor(itemView: View, adapterListener: CompetitorAdapter.AdapterListener) : ModelCardViewHolder<Competitor, CompetitorAdapter.AdapterListener>(itemView, adapterListener) {
+constructor(
+        itemView: View,
+        delegate: (Competitor) -> Unit
+) : ModelCardViewHolder<Competitor>(itemView) {
 
     val dragHandle: View
         get() = itemView.findViewById(R.id.drag_handle)
 
     init {
-        itemView.setOnClickListener { adapterListener.onCompetitorClicked(model) }
+        itemView.setOnClickListener { delegate.invoke(model) }
     }
 
     override fun bind(model: Competitor) {

@@ -25,45 +25,21 @@
 package com.mainstreetcode.teammate.adapters
 
 import android.view.ViewGroup
-
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.AutoCompleteViewHolder
-import com.mainstreetcode.teammate.baseclasses.BaseAdapter
-import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.recyclerview.adapterOf
+import com.tunjid.androidx.view.util.inflate
 
-import com.mainstreetcode.teammate.util.ITEM
-
-class AutoCompleteAdapter(
-        private val predictions: List<AutocompletePrediction>,
-        listener: AdapterListener
-) : BaseAdapter<AutoCompleteViewHolder, AutoCompleteAdapter.AdapterListener>(listener) {
-
-    init {
-        setHasStableIds(true)
-    }
-
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): AutoCompleteViewHolder =
-            AutoCompleteViewHolder(getItemView(R.layout.viewholder_auto_complete, viewGroup), adapterListener)
-
-    override fun onBindViewHolder(holder: AutoCompleteViewHolder, position: Int) {
-        super.onBindViewHolder(holder, position)
-        holder.bind(predictions[position])
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <S : InteractiveAdapter.AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S =
-            adapterListener as S
-
-    override fun getItemCount(): Int = predictions.size
-
-    override fun getItemId(position: Int): Long = predictions[position].hashCode().toLong()
-
-    override fun getItemViewType(position: Int): Int = ITEM
-
-    interface AdapterListener : InteractiveAdapter.AdapterListener {
-        fun onPredictionClicked(prediction: AutocompletePrediction)
-    }
-
-}
+fun autoCompleteAdapter(
+        modelSource: () -> List<AutocompletePrediction>,
+        listener: (AutocompletePrediction) -> Unit
+): RecyclerView.Adapter<AutoCompleteViewHolder> = adapterOf(
+        itemsSource = modelSource,
+        viewHolderCreator = { viewGroup: ViewGroup, _: Int ->
+            AutoCompleteViewHolder(viewGroup.inflate(R.layout.viewholder_auto_complete), listener)
+        },
+        viewHolderBinder = { holder, item, _ -> holder.bind(item) },
+        itemIdFunction = { it.hashCode().toLong() }
+)

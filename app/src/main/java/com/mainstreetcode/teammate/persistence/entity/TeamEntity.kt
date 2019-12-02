@@ -44,7 +44,7 @@ open class TeamEntity : Parcelable {
     @NonNull
     @PrimaryKey
     @ColumnInfo(name = "team_id")
-    private var id: String
+    var id: String
 
     @ColumnInfo(name = "team_image_url")
     open var imageUrl: String
@@ -140,11 +140,9 @@ open class TeamEntity : Parcelable {
         maxAge = `in`.readInt()
     }
 
-    fun getId(): String = id
+    
 
-    protected fun setId(id: String) {
-        this.id = id
-    }
+    
 
     protected fun setName(name: String) {
         this.name = name

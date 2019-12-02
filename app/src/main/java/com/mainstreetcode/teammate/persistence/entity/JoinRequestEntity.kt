@@ -62,7 +62,7 @@ open class JoinRequestEntity : Parcelable {
     @NonNull
     @PrimaryKey
     @ColumnInfo(name = "join_request_id")
-    private var id: String
+    var id: String
 
     @ColumnInfo(name = "join_request_role_name")
     var position: Position
@@ -99,11 +99,9 @@ open class JoinRequestEntity : Parcelable {
         created = Date(`in`.readLong())
     }
 
-    fun getId(): String = id
+    
 
-    protected fun setId(id: String) {
-        this.id = id
-    }
+    
 
     fun setPosition(position: String) {
         this.position = Config.positionFromCode(position)

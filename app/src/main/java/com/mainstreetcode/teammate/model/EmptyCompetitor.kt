@@ -47,7 +47,8 @@ class EmptyCompetitor : Competitive {
         `in`.readString()
     }
 
-    override fun getId(): String = ""
+    override val id: String
+        get() = ""
 
     override fun makeCopy(): Competitive = EmptyCompetitor()
 

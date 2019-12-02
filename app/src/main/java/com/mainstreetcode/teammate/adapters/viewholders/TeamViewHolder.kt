@@ -25,8 +25,8 @@
 package com.mainstreetcode.teammate.adapters.viewholders
 
 import android.view.View
+import com.mainstreetcode.teammate.adapters.Shell
 
-import com.mainstreetcode.teammate.adapters.TeamAdapter
 import com.mainstreetcode.teammate.model.Team
 
 /**
@@ -34,11 +34,11 @@ import com.mainstreetcode.teammate.model.Team
  */
 class TeamViewHolder(
         itemView: View,
-        adapterListener: TeamAdapter.AdapterListener
-) : ModelCardViewHolder<Team, TeamAdapter.AdapterListener>(itemView, adapterListener), View.OnClickListener {
+        delegate: Shell.TeamAdapterListener
+) : ModelCardViewHolder<Team>(itemView) {
 
     init {
-        itemView.setOnClickListener(this)
+        itemView.setOnClickListener { delegate.onTeamClicked(model) }
     }
 
     override fun bind(model: Team) {
@@ -48,7 +48,4 @@ class TeamViewHolder(
         setSubTitle(model.city)
     }
 
-    override fun onClick(view: View) {
-        adapterListener.onTeamClicked(model)
-    }
 }

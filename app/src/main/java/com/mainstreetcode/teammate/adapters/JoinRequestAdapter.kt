@@ -25,13 +25,12 @@
 package com.mainstreetcode.teammate.adapters
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.input.SpinnerTextInputStyle
 import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle
 import com.mainstreetcode.teammate.adapters.viewholders.input.or
-import com.mainstreetcode.teammate.baseclasses.BaseAdapter
-import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.model.Config
 import com.mainstreetcode.teammate.model.Item
@@ -40,73 +39,62 @@ import com.mainstreetcode.teammate.model.enums.Sport
 import com.mainstreetcode.teammate.model.neverEnabled
 import com.mainstreetcode.teammate.model.noIcon
 import com.mainstreetcode.teammate.model.noInputValidation
-import com.mainstreetcode.teammate.util.ITEM
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.adapterOf
+import com.tunjid.androidx.recyclerview.diff.Differentiable
+import com.tunjid.androidx.view.util.inflate
 
-/**
- * Adapter for [JoinRequestAdapter]
- */
+interface JoinRequestAdapterListener : ImageWorkerFragment.ImagePickerListener {
+    fun canEditFields(): Boolean
 
-class JoinRequestAdapter(
-        private val items: List<Differentiable>,
-        listener: AdapterListener
-) : BaseAdapter<InputViewHolder<JoinRequestAdapter.AdapterListener>, JoinRequestAdapter.AdapterListener>(listener) {
+    fun canEditRole(): Boolean
+}
 
-    private val chooser: TextInputStyle.InputChooser
+fun joinRequestAdapter(
+        modelSource: () -> List<Differentiable>,
+        delegate: JoinRequestAdapterListener
+): RecyclerView.Adapter<InputViewHolder> {
+    val chooser = JoinRequestChooser(delegate)
+    return adapterOf(
+            itemsSource = modelSource,
+            viewHolderCreator = { viewGroup: ViewGroup, _: Int ->
+                InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
+            },
+            viewHolderBinder = { holder, item, _ ->
+                if (item is Item) holder.bind(chooser[item])
+            },
+            itemIdFunction = { it.diffId.hashCode().toLong() },
+            onViewHolderRecycled = InputViewHolder::clear,
+            onViewHolderDetached = InputViewHolder::onDetached,
+            onViewHolderRecycleFailed = { it.clear(); false }
+    )
+}
 
-    init {
-        chooser = Chooser(adapterListener)
-    }
+private class JoinRequestChooser internal constructor(
+        private val delegate: JoinRequestAdapterListener
+) : TextInputStyle.InputChooser() {
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): InputViewHolder<AdapterListener> =
-            InputViewHolder(getItemView(R.layout.viewholder_simple_input, viewGroup))
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <S : InteractiveAdapter.AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S =
-            adapterListener as S
-
-    override fun onBindViewHolder(holder: InputViewHolder<AdapterListener>, position: Int) {
-        super.onBindViewHolder(holder, position)
-        val item = items[position]
-        if (item is Item) holder.bind(chooser[item])
-    }
-
-    override fun getItemCount(): Int = items.size
-
-    override fun getItemViewType(position: Int): Int = ITEM
-
-    interface AdapterListener : ImageWorkerFragment.ImagePickerListener {
-        fun canEditFields(): Boolean
-
-        fun canEditRole(): Boolean
-    }
-
-    internal class Chooser internal constructor(private val adapterListener: AdapterListener) : TextInputStyle.InputChooser() {
-
-        override fun invoke(item: Item): TextInputStyle {
-            when (val itemType = item.itemType) {
-                Item.SPORT -> return SpinnerTextInputStyle(
-                        R.string.choose_sport,
-                        Config.getSports(),
-                        Sport::name,
-                        Sport::code,
-                        Item::neverEnabled,
-                        Item::noInputValidation)
-                Item.ROLE -> return SpinnerTextInputStyle(
-                        R.string.choose_role,
-                        Config.getPositions(),
-                        Position::name,
-                        Position::code,
-                        { adapterListener.canEditRole() },
-                        Item::noInputValidation)
-                else -> return TextInputStyle(
-                        Item.noClicks,
-                        Item.noClicks,
-                        or<(Item) -> Boolean>(itemType == Item.INPUT, { adapterListener.canEditFields() }, Item::neverEnabled),
-                        Item::noInputValidation,
-                        Item::noIcon)
-            }
+    override fun invoke(item: Item): TextInputStyle {
+        when (val itemType = item.itemType) {
+            Item.SPORT -> return SpinnerTextInputStyle(
+                    R.string.choose_sport,
+                    Config.getSports(),
+                    Sport::name,
+                    Sport::code,
+                    Item::neverEnabled,
+                    Item::noInputValidation)
+            Item.ROLE -> return SpinnerTextInputStyle(
+                    R.string.choose_role,
+                    Config.getPositions(),
+                    Position::name,
+                    Position::code,
+                    { delegate.canEditRole() },
+                    Item::noInputValidation)
+            else -> return TextInputStyle(
+                    Item.noClicks,
+                    Item.noClicks,
+                    or<(Item) -> Boolean>(itemType == Item.INPUT, { delegate.canEditFields() }, Item::neverEnabled),
+                    Item::noInputValidation,
+                    Item::noIcon)
         }
     }
 }

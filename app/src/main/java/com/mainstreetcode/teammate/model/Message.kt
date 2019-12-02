@@ -32,7 +32,6 @@ import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.rest.TeammateService
 import com.mainstreetcode.teammate.util.Logger
 import com.mainstreetcode.teammate.util.asStringOrEmpty
-import com.tunjid.androidbootstrap.functions.collections.Lists.findFirst
 import io.reactivex.exceptions.CompositeException
 import retrofit2.HttpException
 import java.lang.reflect.Type
@@ -142,7 +141,7 @@ fun Throwable.toMessage(): Message? {
     if (this is HttpException) {
         return Message(this)
     } else if (this is CompositeException) {
-        val httpException = findFirst(exceptions, HttpException::class.java)
+        val httpException = exceptions.filterIsInstance(HttpException::class.java).firstOrNull()
         if (httpException != null) return Message(httpException)
     }
     return null

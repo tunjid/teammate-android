@@ -26,16 +26,16 @@ package com.mainstreetcode.teammate.adapters.viewholders
 
 import android.view.View
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.EventEditAdapter
+import com.mainstreetcode.teammate.adapters.EventEditAdapterListener
 import com.mainstreetcode.teammate.model.Guest
 
 class GuestViewHolder(
         itemView: View,
-        listener: EventEditAdapter.EventEditAdapterListener
-) : ModelCardViewHolder<Guest, EventEditAdapter.EventEditAdapterListener>(itemView, listener), View.OnClickListener {
+        listener: EventEditAdapterListener
+) : ModelCardViewHolder<Guest>(itemView) {
 
     init {
-        itemView.setOnClickListener(this)
+        itemView.setOnClickListener { listener.onGuestClicked(model) }
     }
 
     override fun bind(model: Guest) {
@@ -47,7 +47,4 @@ class GuestViewHolder(
         subtitle.text = context.getString(if (model.isAttending) R.string.event_attending else R.string.event_not_attending)
     }
 
-    override fun onClick(view: View) {
-        adapterListener.onGuestClicked(model)
-    }
 }

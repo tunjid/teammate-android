@@ -27,29 +27,26 @@ package com.mainstreetcode.teammate.fragments.main
 import android.os.Bundle
 import android.transition.AutoTransition
 import android.transition.TransitionManager
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
-import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.MODE_FIXED
 import com.google.android.material.tabs.TabLayout.MODE_SCROLLABLE
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.TeamAdapter
+import com.mainstreetcode.teammate.adapters.Shell
 import com.mainstreetcode.teammate.adapters.TournamentRoundAdapter
-import com.mainstreetcode.teammate.adapters.UserAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.UserViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
+import com.mainstreetcode.teammate.baseclasses.removeSharedElementTransitions
+import com.mainstreetcode.teammate.databinding.FragmentGamesParentBinding
 import com.mainstreetcode.teammate.model.Competitor
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.model.Tournament
@@ -58,66 +55,66 @@ import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.processEmoji
 import com.mainstreetcode.teammate.viewmodel.gofers.Gofer
 
-class TournamentDetailFragment : MainActivityFragment() {
+class TournamentDetailFragment : TeammatesBaseFragment(R.layout.fragment_games_parent) {
 
     private lateinit var tournament: Tournament
     private lateinit var competitor: Competitor
 
-    private var viewPager: ViewPager? = null
-    private var tabLayout: TabLayout? = null
+    private var binding: FragmentGamesParentBinding? = null
     private var viewHolder: EmptyViewHolder? = null
-    internal var gamesRecycledViewPool: RecyclerView.RecycledViewPool? = null
+
+    internal var gamesRecycledViewPool: RecyclerView.RecycledViewPool = RecyclerView.RecycledViewPool()
         private set
 
-    override val fabStringResource: Int @StringRes get() = R.string.add_tournament_competitors
-
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_group_add_white_24dp
-
-    override val toolbarMenu: Int get() = R.menu.fragment_tournament_detail
-
-    override val toolbarTitle: CharSequence get() = getString(R.string.tournament_fixtures)
-
-    override val showsFab: Boolean get() = localRoleViewModel.hasPrivilegedRole() && !tournament.hasCompetitors()
+    override val showsFab: Boolean get() = roleScopeViewModel.hasPrivilegedRole(tournament.host) && !tournament.hasCompetitors()
 
     internal fun pending(competitor: Competitor): TournamentDetailFragment = apply {
         arguments!!.putParcelable(ARG_COMPETITOR, competitor)
     }
 
-    override fun getStableTag(): String =
-            Gofer.tag(super.getStableTag(), arguments!!.getParcelable(ARG_TOURNAMENT)!!)
+    override val stableTag: String
+        get() =
+            Gofer.tag(super.stableTag, arguments!!.getParcelable(ARG_TOURNAMENT)!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val args = arguments
         tournament = args!!.getParcelable(ARG_TOURNAMENT)!!
         competitor = args.getParcelable(ARG_COMPETITOR) ?: Competitor.empty()
-        gamesRecycledViewPool = RecyclerView.RecycledViewPool()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_games_parent, container, false)
-        viewPager = root.findViewById(R.id.view_pager)
-        tabLayout = root.findViewById(R.id.tab_layout)
-        viewHolder = EmptyViewHolder(root, R.drawable.ic_score_white_24dp, R.string.tournament_games_desc)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = FragmentGamesParentBinding.bind(view).run {
+        super.onViewCreated(view, savedInstanceState)
+        defaultUi(
+                toolbarTitle = getString(R.string.tournament_fixtures),
+                toolBarMenu = R.menu.fragment_tournament_detail,
+                fabIcon = R.drawable.ic_group_add_white_24dp,
+                fabText = R.string.add_tournament_competitors,
+                fabShows = showsFab
+        )
 
-        viewPager?.adapter = TournamentRoundAdapter(tournament, childFragmentManager)
-        viewPager?.currentItem = tournament.currentRound
+        viewHolder = EmptyViewHolder(view, R.drawable.ic_score_white_24dp, R.string.tournament_games_desc)
 
-        setUpWinner(root as ViewGroup, tournament.numRounds)
+        viewPager?.apply {
+            adapter = TournamentRoundAdapter(tournament, childFragmentManager)
+            setCurrentItem(tournament.currentRound, false)
+        }
 
-        return root
+        binding = this
+
+        setUpWinner(tournament.numRounds)
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
-        val hasPrivilegedRole = localRoleViewModel.hasPrivilegedRole()
+        val hasPrivilegedRole = roleScopeViewModel.hasPrivilegedRole(tournament.host)
         menu.findItem(R.id.action_edit)?.isVisible = hasPrivilegedRole
         menu.findItem(R.id.action_delete)?.isVisible = hasPrivilegedRole
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.action_edit -> showFragment(TournamentEditFragment.newInstance(tournament))
-        R.id.action_standings -> showFragment(StatDetailFragment.newInstance(tournament))
+        R.id.action_edit -> navigator.push(TournamentEditFragment.newInstance(tournament))
+        R.id.action_standings -> navigator.push(StatDetailFragment.newInstance(tournament))
         R.id.action_delete -> AlertDialog.Builder(requireContext()).setTitle(getString(R.string.delete_tournament_prompt))
                 .setPositiveButton(R.string.yes) { _, _ -> deleteTournament() }
                 .setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
@@ -128,32 +125,26 @@ class TournamentDetailFragment : MainActivityFragment() {
     override fun onResume() {
         super.onResume()
         checkCompetitor()
-        watchForRoleChanges(tournament.host, this::togglePersistentUi)
+        watchForRoleChanges(tournament.host) { updateUi(fabShows = showsFab, toolbarInvalidated = true) }
 
         val rounds = tournament.numRounds
         disposables.add(tournamentViewModel.checkForWinner(tournament)
-                .subscribe({ setUpWinner(view as ViewGroup?, rounds) }, defaultErrorHandler::invoke))
+                .subscribe({ setUpWinner(rounds) }, defaultErrorHandler::invoke))
     }
 
     override fun onDestroyView() {
-        viewPager = null
-        tabLayout = null
+        binding = null
         viewHolder = null
         super.onDestroyView()
     }
 
     override fun onClick(view: View) {
-        if (view.id == R.id.fab) showFragment(CompetitorsFragment.newInstance(tournament))
-    }
-
-    override fun togglePersistentUi() {
-        super.togglePersistentUi()
-        activity?.invalidateOptionsMenu()
+        if (view.id == R.id.fab) navigator.push(CompetitorsFragment.newInstance(tournament))
     }
 
     private fun checkCompetitor() {
         if (competitor.isEmpty || competitor.isAccepted) return
-        if (restoredFromBackStack())
+        if (restoredFromBackStack)
         // Don't prompt for the same competitor multiple times.
             disposables.add(competitorViewModel.updateCompetitor(competitor).subscribe(this::promptForCompetitor, ErrorHandler.EMPTY::invoke))
         else
@@ -162,7 +153,7 @@ class TournamentDetailFragment : MainActivityFragment() {
 
     private fun promptForCompetitor() {
         if (competitor.isEmpty || competitor.isAccepted) return
-        showChoices { choiceBar ->
+        transientBarDriver.showChoices { choiceBar ->
             choiceBar.setText(getString(R.string.tournament_accept))
                     .setPositiveText(getText(R.string.accept))
                     .setNegativeText(getText(R.string.decline))
@@ -172,9 +163,9 @@ class TournamentDetailFragment : MainActivityFragment() {
     }
 
     private fun respond(accept: Boolean) {
-        toggleProgress(true)
+        transientBarDriver.toggleProgress(true)
         disposables.add(competitorViewModel.respond(competitor, accept)
-                .subscribe({ toggleProgress(false) }, defaultErrorHandler::invoke))
+                .subscribe({ transientBarDriver.toggleProgress(false) }, defaultErrorHandler::invoke))
     }
 
     private fun deleteTournament() {
@@ -182,14 +173,12 @@ class TournamentDetailFragment : MainActivityFragment() {
     }
 
     private fun onTournamentDeleted(deleted: Tournament) {
-        showSnackbar(getString(R.string.deleted_team, deleted.name))
-        removeEnterExitTransitions()
+        transientBarDriver.showSnackBar(getString(R.string.deleted_team, deleted.name))
+        removeSharedElementTransitions()
         requireActivity().onBackPressed()
     }
 
-    private fun setUpWinner(root: ViewGroup?, prevAdapterCount: Int) {
-        if (root == null) return
-
+    private fun setUpWinner(prevAdapterCount: Int) = binding?.run {
         val winnerText = root.findViewById<TextView>(R.id.winner)
         val winnerView = root.findViewById<ViewGroup>(R.id.item_container)
         val adapter = root.findViewById<ViewPager>(R.id.view_pager).adapter
@@ -197,16 +186,16 @@ class TournamentDetailFragment : MainActivityFragment() {
         if (prevAdapterCount != tournament.numRounds && adapter != null)
             adapter.notifyDataSetChanged()
 
-        TransitionManager.beginDelayedTransition(root, AutoTransition()
+        TransitionManager.beginDelayedTransition(innerCoordinator, AutoTransition()
                 .addTarget(tabLayout)
                 .addTarget(viewPager)
                 .addTarget(winnerView)
                 .addTarget(winnerText))
 
         val hasCompetitors = tournament.numCompetitors > 0
-        tabLayout?.tabMode = if (tournament.numRounds > 4) MODE_SCROLLABLE else MODE_FIXED
-        tabLayout?.visibility = if (hasCompetitors) View.VISIBLE else View.GONE
-        tabLayout?.setupWithViewPager(viewPager)
+        tabLayout.tabMode = if (tournament.numRounds > 4) MODE_SCROLLABLE else MODE_FIXED
+        tabLayout.visibility = if (hasCompetitors) View.VISIBLE else View.GONE
+        tabLayout.setupWithViewPager(viewPager)
         viewHolder?.setColor(R.attr.alt_empty_view_holder_tint)
         viewHolder?.toggle(!hasCompetitors)
 
@@ -214,8 +203,8 @@ class TournamentDetailFragment : MainActivityFragment() {
         if (winner.isEmpty) return
 
         when (val competitive = winner.entity) {
-            is User -> UserViewHolder(winnerView, UserAdapter.AdapterListener.asSAM { showCompetitor(winner) }).apply { bind(competitive) }
-            is Team -> TeamViewHolder(winnerView, TeamAdapter.AdapterListener.asSAM { showCompetitor(winner) }).apply { bind(competitive) }
+            is User -> UserViewHolder(winnerView, Shell.UserAdapterListener.asSAM { showCompetitor(winner) }).apply { bind(competitive) }
+            is Team -> TeamViewHolder(winnerView, Shell.TeamAdapterListener.asSAM { showCompetitor(winner) }).apply { bind(competitive) }
             else -> return
         }
 
@@ -223,7 +212,7 @@ class TournamentDetailFragment : MainActivityFragment() {
         winnerView.visibility = View.VISIBLE
 
         winnerText.text = getString(R.string.tournament_winner).processEmoji()
-    }
+    } ?: Unit
 
     companion object {
 
@@ -232,7 +221,6 @@ class TournamentDetailFragment : MainActivityFragment() {
 
         fun newInstance(tournament: Tournament): TournamentDetailFragment = TournamentDetailFragment().apply {
             arguments = bundleOf(ARG_TOURNAMENT to tournament)
-            setEnterExitTransitions()
         }
     }
 }

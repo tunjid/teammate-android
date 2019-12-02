@@ -25,6 +25,7 @@
 package com.mainstreetcode.teammate.adapters
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.UserViewHolder
@@ -32,11 +33,7 @@ import com.mainstreetcode.teammate.adapters.viewholders.input.DateTextInputStyle
 import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.input.SpinnerTextInputStyle
 import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle
-import com.mainstreetcode.teammate.baseclasses.BaseAdapter
-import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
-import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.model.Config
-import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.StatAggregate
 import com.mainstreetcode.teammate.model.Team
@@ -47,86 +44,74 @@ import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.ITEM
 import com.mainstreetcode.teammate.util.TEAM
 import com.mainstreetcode.teammate.util.USER
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
+import com.tunjid.androidx.recyclerview.adapterOf
+import com.tunjid.androidx.recyclerview.diff.Differentiable
+import com.tunjid.androidx.view.util.inflate
 import java.util.*
 
-/**
- * Adapter for [Event]
- */
+interface StatAggregateAdapterListener {
+    fun onUserPicked(user: User)
 
-class StatAggregateRequestAdapter(
-        private val request: StatAggregate.Request,
-        listener: AdapterListener
-) : BaseAdapter<BaseViewHolder<*>, StatAggregateRequestAdapter.AdapterListener>(listener) {
-    private val chooser: TextInputStyle.InputChooser
+    fun onTeamPicked(team: Team)
+}
+
+fun statAggregateRequestAdapter(
+        modelSource: StatAggregate.Request,
+        delegate: StatAggregateAdapterListener
+): RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    val chooser = StatAggregateChooser()
+    return adapterOf<Differentiable, RecyclerView.ViewHolder>(
+            itemsSource = modelSource::items,
+            viewHolderCreator = { viewGroup: ViewGroup, viewType: Int ->
+                when (viewType) {
+                    ITEM -> InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
+                    USER -> UserViewHolder(viewGroup.inflate(R.layout.viewholder_list_item), Shell.UserAdapterListener.asSAM(delegate::onUserPicked))
+                            .withTitle(R.string.pick_user)
+                    TEAM -> TeamViewHolder(viewGroup.inflate(R.layout.viewholder_list_item), Shell.TeamAdapterListener.asSAM(delegate::onTeamPicked))
+                            .withTitle(R.string.pick_team)
+                    else -> InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
+                }
+            },
+            viewHolderBinder = { holder, item, _ ->
+                when {
+                    item is Item && holder is InputViewHolder -> holder.bind(chooser[item])
+                    item is User && holder is UserViewHolder -> holder.bind(item)
+                    item is Team && holder is TeamViewHolder -> holder.bind(item)
+                }
+            },
+            viewTypeFunction = {
+                if (it is Item) ITEM else if (it is User) USER else TEAM
+            },
+            onViewHolderRecycled = { if (it is InputViewHolder) it.clear() },
+            onViewHolderDetached = { if (it is InputViewHolder) it.onDetached() },
+            onViewHolderRecycleFailed = { if (it is InputViewHolder) it.clear(); false }
+    )
+}
+
+private class StatAggregateChooser internal constructor() : TextInputStyle.InputChooser() {
+
+    private val sports: MutableList<Sport>
 
     init {
-        chooser = Chooser()
+        sports = ArrayList(Config.getSports())
+        sports.add(0, Sport.empty())
     }
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): BaseViewHolder<*> = when (viewType) {
-        ITEM -> InputViewHolder<ImageWorkerFragment.ImagePickerListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
-        USER -> UserViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), UserAdapter.AdapterListener.asSAM(adapterListener::onUserPicked))
-                .withTitle(R.string.pick_user)
-        TEAM -> TeamViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), TeamAdapter.AdapterListener.asSAM(adapterListener::onTeamPicked))
-                .withTitle(R.string.pick_team)
-        else -> InputViewHolder<ImageWorkerFragment.ImagePickerListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <S : InteractiveAdapter.AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S = when {
-        viewHolder.itemViewType == USER -> UserAdapter.AdapterListener.asSAM(adapterListener::onUserPicked) as S
-        viewHolder.itemViewType == TEAM -> TeamAdapter.AdapterListener.asSAM(adapterListener::onTeamPicked) as S
-        else -> adapterListener as S
-    }
-
-    override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
-        super.onBindViewHolder(holder, position)
-        when (val identifiable = request.items[position]) {
-            is Item -> (holder as InputViewHolder<*>).bind(chooser[identifiable])
-            is User -> (holder as UserViewHolder).bind(identifiable)
-            is Team -> (holder as TeamViewHolder).bind(identifiable)
-        }
-    }
-
-    override fun getItemCount(): Int = request.items.size
-
-    override fun getItemViewType(position: Int): Int {
-        val identifiable = request.items[position]
-        return if (identifiable is Item) ITEM else if (identifiable is User) USER else TEAM
-    }
-
-    interface AdapterListener : InteractiveAdapter.AdapterListener {
-        fun onUserPicked(user: User)
-
-        fun onTeamPicked(team: Team)
-    }
-
-    internal class Chooser internal constructor() : TextInputStyle.InputChooser() {
-
-        private val sports: MutableList<Sport>
-
-        init {
-            sports = ArrayList(Config.getSports())
-            sports.add(0, Sport.empty())
-        }
-
-        override fun invoke(item: Item): TextInputStyle = when (item.itemType) {
-            Item.SPORT -> SpinnerTextInputStyle(
-                    R.string.choose_sport,
-                    sports,
-                    Sport::name,
-                    Sport::code,
-                    Item::alwaysEnabled,
-                    Item::noInputValidation)
-            Item.DATE -> DateTextInputStyle(Item::alwaysEnabled)
-            else -> SpinnerTextInputStyle(
-                    R.string.choose_sport,
-                    sports,
-                    Sport::name,
-                    Sport::code,
-                    Item::alwaysEnabled,
-                    Item::noInputValidation)
-        }
+    override fun invoke(item: Item): TextInputStyle = when (item.itemType) {
+        Item.SPORT -> SpinnerTextInputStyle(
+                R.string.choose_sport,
+                sports,
+                Sport::name,
+                Sport::code,
+                Item::alwaysEnabled,
+                Item::noInputValidation)
+        Item.DATE -> DateTextInputStyle(Item::alwaysEnabled)
+        else -> SpinnerTextInputStyle(
+                R.string.choose_sport,
+                sports,
+                Sport::name,
+                Sport::code,
+                Item::alwaysEnabled,
+                Item::noInputValidation)
     }
 }

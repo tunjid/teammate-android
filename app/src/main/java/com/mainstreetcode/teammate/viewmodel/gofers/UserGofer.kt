@@ -32,7 +32,7 @@ import com.mainstreetcode.teammate.model.User
 import com.mainstreetcode.teammate.util.ErrorHandler
 import com.mainstreetcode.teammate.util.FunctionalDiff
 import com.mainstreetcode.teammate.util.TeammateException
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
@@ -62,17 +62,18 @@ class UserGofer(
     public override fun delete(): Completable =
             Completable.error(TeammateException("Cannot delete"))
 
-    private fun filter(list: MutableList<Differentiable>): List<Differentiable> {
+    private fun filter(list: List<Differentiable>): List<Differentiable> {
         val isAuthUser = authUserFunction.invoke(model)
         if (isAuthUser) return list
 
-        val it = list.iterator()
+        val mutable = list.toMutableList()
+        val it = mutable.iterator()
 
         while (it.hasNext()) {
             val next = it.next() as? Item ?: continue
             if (next.stringRes == R.string.email) it.remove()
         }
 
-        return list
+        return mutable
     }
 }

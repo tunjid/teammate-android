@@ -25,41 +25,31 @@
 package com.mainstreetcode.teammate.fragments.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.TeamAdapter
+import com.mainstreetcode.teammate.adapters.Shell
+import com.mainstreetcode.teammate.adapters.teamAdapter
 import com.mainstreetcode.teammate.adapters.viewholders.EmptyViewHolder
-import com.mainstreetcode.teammate.baseclasses.MainActivityFragment
+import com.mainstreetcode.teammate.baseclasses.TeammatesBaseFragment
 import com.mainstreetcode.teammate.model.Role
 import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.util.ScrollManager
-import com.tunjid.androidbootstrap.recyclerview.InteractiveViewHolder
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.diff.Differentiable
 
 /**
  * Searches for teams
  */
 
-class TeamsFragment : MainActivityFragment(), TeamAdapter.AdapterListener {
+class TeamsFragment : TeammatesBaseFragment(R.layout.fragment_list_with_refresh),
+        Shell.TeamAdapterListener {
 
     private lateinit var roles: List<Differentiable>
 
-    override val fabStringResource: Int @StringRes get() = R.string.team_search_create
-
-    override val fabIconResource: Int @DrawableRes get() = R.drawable.ic_search_white_24dp
-
-    override val toolbarTitle: CharSequence get() = getString(R.string.my_teams)
-
     private val isTeamPicker: Boolean get() = targetRequestCode != 0
-
-    override val staticViews: IntArray get() = EXCLUDED_VIEWS
-
-    override val showsBottomNav: Boolean get() = true
 
     override val showsFab: Boolean get() = !isTeamPicker || roles.isEmpty()
 
@@ -84,34 +74,41 @@ class TeamsFragment : MainActivityFragment(), TeamAdapter.AdapterListener {
             else -> R.string.no_team
         }
 
-    override fun getStableTag(): String {
-        var superResult = super.getStableTag()
-        val target = targetFragment
-        if (target != null) superResult += "-" + target.tag + "-" + targetRequestCode
-        return superResult
-    }
+    override val stableTag: String
+        get() {
+            var superResult = super.stableTag
+            val target = targetFragment
+            if (target != null) superResult += "-" + target.tag + "-" + targetRequestCode
+            return superResult
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         roles = roleViewModel.getModelList(Role::class.java)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.fragment_list_with_refresh, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        defaultUi(
+                toolbarTitle = getString(R.string.my_teams),
+                fabIcon = R.drawable.ic_search_white_24dp,
+                fabText = R.string.team_search_create,
+                fabShows = showsFab
+        )
+        val refreshAction = {
+            disposables.add(roleViewModel.refresh(Role::class.java)
+                    .subscribe(this::onTeamsUpdated, defaultErrorHandler::invoke)).let { Unit }
+        }
 
-        val refreshAction = Runnable { disposables.add(roleViewModel.refresh(Role::class.java).subscribe(this::onTeamsUpdated, defaultErrorHandler::invoke)) }
-
-        scrollManager = ScrollManager.with<InteractiveViewHolder<*>>(root.findViewById(R.id.list_layout))
-                .withPlaceholder(EmptyViewHolder(root, emptyDrawable, emptyText))
-                .withRefreshLayout(root.findViewById(R.id.refresh_layout), refreshAction)
+        scrollManager = ScrollManager.with<RecyclerView.ViewHolder>(view.findViewById(R.id.list_layout))
+                .withPlaceholder(EmptyViewHolder(view, emptyDrawable, emptyText))
+                .withRefreshLayout(view.findViewById(R.id.refresh_layout), refreshAction)
                 .addScrollListener { _, dy -> updateFabForScrollState(dy) }
                 .addScrollListener { _, _ -> updateTopSpacerElevation() }
                 .withInconsistencyHandler(this::onInconsistencyDetected)
-                .withAdapter(TeamAdapter(roles, this))
+                .withAdapter(teamAdapter(::roles, this))
                 .withStaggeredGridLayoutManager(2)
                 .build()
-
-        return root
     }
 
     override fun onResume() {
@@ -121,19 +118,19 @@ class TeamsFragment : MainActivityFragment(), TeamAdapter.AdapterListener {
 
     override fun onTeamClicked(item: Team) {
         val target = targetFragment
-        val canPick = target is TeamAdapter.AdapterListener
+        val canPick = target is Shell.TeamAdapterListener
 
-        if (canPick) (target as TeamAdapter.AdapterListener).onTeamClicked(item)
+        if (canPick) (target as Shell.TeamAdapterListener).onTeamClicked(item)
         else {
             teamViewModel.updateDefaultTeam(item)
-            showFragment(TeamMembersFragment.newInstance(item))
+            navigator.push(TeamMembersFragment.newInstance(item))
         }
     }
 
     override fun onClick(view: View) = when (view.id) {
         R.id.fab -> {
-            hideBottomSheet()
-            showFragment(TeamSearchFragment.newInstance()).let { Unit }
+            bottomSheetDriver.hideBottomSheet()
+            navigator.push(TeamSearchFragment.newInstance()).let { Unit }
         }
         else -> Unit
     }
@@ -145,12 +142,10 @@ class TeamsFragment : MainActivityFragment(), TeamAdapter.AdapterListener {
 
     private fun onTeamsUpdated(result: DiffUtil.DiffResult) {
         scrollManager.onDiff(result)
-        togglePersistentUi()
+        updateUi(fabShows = showsFab)
     }
 
     companion object {
-
-        private val EXCLUDED_VIEWS = intArrayOf(R.id.list_layout)
 
         fun newInstance(): TeamsFragment = TeamsFragment().apply { arguments = Bundle() }
     }

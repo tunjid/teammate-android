@@ -27,27 +27,22 @@ package com.mainstreetcode.teammate.adapters.viewholders
 import android.view.View
 import androidx.core.view.ViewCompat.setTransitionName
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.FeedAdapter
 import com.mainstreetcode.teammate.model.Event
 import com.mainstreetcode.teammate.model.JoinRequest
 import com.mainstreetcode.teammate.model.Media
 import com.mainstreetcode.teammate.model.RemoteImage
-import com.mainstreetcode.teammate.model.Team
 import com.mainstreetcode.teammate.notifications.FeedItem
 import com.mainstreetcode.teammate.util.getTransitionName
 
-/**
- * Viewholder for a [Team]
- */
 class FeedItemViewHolder(
         itemView: View,
-        listener: FeedAdapter.FeedItemAdapterListener
-) : ModelCardViewHolder<RemoteImage, FeedAdapter.FeedItemAdapterListener>(itemView, listener), View.OnClickListener {
+        listener: (FeedItem<*>) -> Unit
+) : ModelCardViewHolder<RemoteImage>(itemView) {
 
     private lateinit var item: FeedItem<*>
 
     init {
-        itemView.setOnClickListener(this)
+        itemView.setOnClickListener { listener.invoke(item) }
     }
 
     fun bind(item: FeedItem<*>) {
@@ -69,7 +64,4 @@ class FeedItemViewHolder(
         }
     }
 
-    override fun onClick(view: View) {
-        adapterListener.onFeedItemClicked(item)
-    }
 }

@@ -31,15 +31,17 @@ import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.StatTypeAdapter
+import com.mainstreetcode.teammate.adapters.StatTypeAdapterListener
+import com.mainstreetcode.teammate.adapters.statTypeAdapter
+import com.mainstreetcode.teammate.adapters.viewholders.ChipViewHolder
 import com.mainstreetcode.teammate.model.Stat
 import com.mainstreetcode.teammate.model.enums.StatAttribute
 import com.mainstreetcode.teammate.model.enums.StatType
 import com.mainstreetcode.teammate.model.enums.StatTypes
 
-class StatAttributeViewHolder(itemView: View, stat: Stat) : InputViewHolder<Nothing>(itemView) {
+class StatAttributeViewHolder(itemView: View, stat: Stat) : InputViewHolder(itemView) {
 
-    private lateinit var adapter: StatTypeAdapter
+    private lateinit var adapter: RecyclerView.Adapter<ChipViewHolder>
     private val statType = StatType.empty()
     private val statTypes: StatTypes = stat.sport.stats
 
@@ -52,7 +54,7 @@ class StatAttributeViewHolder(itemView: View, stat: Stat) : InputViewHolder<Noth
         get() = -((itemView.height - hint.height - recyclerView.height) * 0.5f)
 
     init {
-        adapter = StatTypeAdapter(object : StatTypeAdapter.AdapterListener {
+        adapter = statTypeAdapter(object : StatTypeAdapterListener {
             override val attributes: List<StatAttribute>
                 get() = if (isEnabled) statType.attributes else stat.attributes
 

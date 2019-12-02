@@ -24,7 +24,7 @@
 
 package com.mainstreetcode.teammate.adapters
 
-import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
 import com.mainstreetcode.teammate.adapters.viewholders.TeamViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.UserViewHolder
@@ -32,8 +32,6 @@ import com.mainstreetcode.teammate.adapters.viewholders.input.InputViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.input.SpinnerTextInputStyle
 import com.mainstreetcode.teammate.adapters.viewholders.input.StatAttributeViewHolder
 import com.mainstreetcode.teammate.adapters.viewholders.input.TextInputStyle
-import com.mainstreetcode.teammate.baseclasses.BaseAdapter
-import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.fragments.headless.ImageWorkerFragment
 import com.mainstreetcode.teammate.model.Item
 import com.mainstreetcode.teammate.model.Item.Companion.STAT_TYPE
@@ -48,93 +46,92 @@ import com.mainstreetcode.teammate.model.noInputValidation
 import com.mainstreetcode.teammate.util.ITEM
 import com.mainstreetcode.teammate.util.TEAM
 import com.mainstreetcode.teammate.util.USER
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
-import com.tunjid.androidbootstrap.recyclerview.diff.Differentiable
+import com.tunjid.androidx.recyclerview.adapterOf
+import com.tunjid.androidx.recyclerview.diff.Differentiable
+import com.tunjid.androidx.view.util.inflate
 
 /**
  * Adapter for [com.mainstreetcode.teammate.model.Tournament]
  */
 
-class StatEditAdapter(private val items: List<Differentiable>, listener: AdapterListener) : BaseAdapter<BaseViewHolder<*>, StatEditAdapter.AdapterListener>(listener) {
-    private val chooser: TextInputStyle.InputChooser
-    private val userListener = UserAdapter.AdapterListener.asSAM { adapterListener.onUserClicked() }
-    private val teamListener = TeamAdapter.AdapterListener.asSAM { adapterListener.onTeamClicked() }
 
-    init {
-        chooser = Chooser(adapterListener)
-    }
+interface StatEditListener : ImageWorkerFragment.ImagePickerListener {
+    val stat: Stat
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): BaseViewHolder<*> = when (viewType) {
-        ITEM -> InputViewHolder<AdapterListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
-        STAT_TYPE -> StatAttributeViewHolder(getItemView(R.layout.viewholder_stat_type, viewGroup),
-                adapterListener.stat)
-        USER -> UserViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), userListener)
-        TEAM -> TeamViewHolder(getItemView(R.layout.viewholder_list_item, viewGroup), teamListener)
-        else -> InputViewHolder<AdapterListener>(getItemView(R.layout.viewholder_simple_input, viewGroup))
-    }
+    fun onUserClicked()
 
-    @Suppress("UNCHECKED_CAST")
-    override fun <S : InteractiveAdapter.AdapterListener> updateListener(viewHolder: BaseViewHolder<S>): S = when {
-        viewHolder.itemViewType == USER -> userListener as S
-        viewHolder.itemViewType == TEAM -> teamListener as S
-        else -> adapterListener as S
-    }
+    fun onTeamClicked()
 
-    override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
-        super.onBindViewHolder(holder, position)
+    fun canChangeStat(): Boolean
+}
 
-        when (val item = items[position]) {
-            is Item -> (holder as InputViewHolder<*>).bind(chooser[item])
-            is User -> (holder as UserViewHolder).bind(item)
-            is Team -> (holder as TeamViewHolder).bind(item)
-        }
-    }
+fun statEditAdapter(
+        items: List<Differentiable>,
+        delegate: StatEditListener
+): RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    override fun getItemCount(): Int = items.size
+    val chooser = Chooser(delegate)
+    val userListener = Shell.UserAdapterListener.asSAM { delegate.onUserClicked() }
+    val teamListener = Shell.TeamAdapterListener.asSAM { delegate.onTeamClicked() }
 
-    override fun getItemViewType(position: Int): Int {
-        return when (val differentiable = items[position]) {
-            is Item ->
-                if (STAT_TYPE == differentiable.itemType) STAT_TYPE
-                else ITEM
-            is User -> USER
-            else -> TEAM
-        }
-    }
+    return adapterOf(
+            itemsSource = { items },
+            viewHolderCreator = { viewGroup, viewType ->
+                when (viewType) {
+                    ITEM -> InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
+                    STAT_TYPE -> StatAttributeViewHolder(viewGroup.inflate(R.layout.viewholder_stat_type),
+                            delegate.stat)
+                    USER -> UserViewHolder(viewGroup.inflate(R.layout.viewholder_list_item), userListener)
+                    TEAM -> TeamViewHolder(viewGroup.inflate(R.layout.viewholder_list_item), teamListener)
+                    else -> InputViewHolder(viewGroup.inflate(R.layout.viewholder_simple_input))
+                }
+            },
+            viewHolderBinder = { holder, item, _ ->
+                when {
+                    item is User && holder is UserViewHolder -> holder.bind(item)
+                    item is Team && holder is TeamViewHolder -> holder.bind(item)
+                    item is Item && holder is InputViewHolder -> {
+                        holder.clear()
+                        holder.onDetached()
+                        holder.bind(chooser[item])
+                    }
+                }
+            },
+            viewTypeFunction = {
+                when (it) {
+                    is Item -> if (STAT_TYPE == it.itemType) STAT_TYPE else ITEM
+                    is User -> USER
+                    else -> TEAM
+                }
+            },
+            onViewHolderRecycled = { if (it is InputViewHolder) it.clear() },
+            onViewHolderDetached = { if (it is InputViewHolder) it.onDetached() },
+            onViewHolderRecycleFailed = { if (it is InputViewHolder) it.clear(); false }
+    )
+}
 
-    interface AdapterListener : ImageWorkerFragment.ImagePickerListener {
-        val stat: Stat
+internal class Chooser internal constructor(private val delegate: StatEditListener) : TextInputStyle.InputChooser() {
 
-        fun onUserClicked()
-
-        fun onTeamClicked()
-
-        fun canChangeStat(): Boolean
-    }
-
-    internal class Chooser internal constructor(private val adapterListener: AdapterListener) : TextInputStyle.InputChooser() {
-
-        override fun invoke(item: Item): TextInputStyle = when (item.itemType) {
-            Item.INPUT, Item.NUMBER -> TextInputStyle(
-                    Item.noClicks,
-                    Item.noClicks,
-                    Item::alwaysEnabled,
-                    Item::noBlankFields,
-                    Item::noIcon)
-            STAT_TYPE -> SpinnerTextInputStyle(
-                    R.string.choose_stat,
-                    adapterListener.stat.sport.stats,
-                    StatType::emojiAndName,
-                    StatType::code,
-                    { adapterListener.canChangeStat() },
-                    Item::noInputValidation)
-            else -> TextInputStyle(
-                    Item.noClicks,
-                    Item.noClicks,
-                    Item::alwaysEnabled,
-                    Item::noBlankFields,
-                    Item::noIcon
-            )
-        }
+    override fun invoke(item: Item): TextInputStyle = when (item.itemType) {
+        Item.INPUT, Item.NUMBER -> TextInputStyle(
+                Item.noClicks,
+                Item.noClicks,
+                Item::alwaysEnabled,
+                Item::noBlankFields,
+                Item::noIcon)
+        STAT_TYPE -> SpinnerTextInputStyle(
+                R.string.choose_stat,
+                delegate.stat.sport.stats,
+                StatType::emojiAndName,
+                StatType::code,
+                { delegate.canChangeStat() },
+                Item::noInputValidation)
+        else -> TextInputStyle(
+                Item.noClicks,
+                Item.noClicks,
+                Item::alwaysEnabled,
+                Item::noBlankFields,
+                Item::noIcon
+        )
     }
 }

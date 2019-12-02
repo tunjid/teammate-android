@@ -28,24 +28,22 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.StringRes
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.model.RemoteImage
 import com.mainstreetcode.teammate.util.THUMBNAIL_SIZE
 import com.squareup.picasso.Picasso
-import com.tunjid.androidbootstrap.recyclerview.InteractiveAdapter
 
 
-open class ModelCardViewHolder<H : RemoteImage, T : InteractiveAdapter.AdapterListener> internal constructor(
-        itemView: View,
-        adapterListener: T
-) : BaseViewHolder<T>(itemView, adapterListener) {
+open class ModelCardViewHolder<H : RemoteImage> internal constructor(
+        itemView: View
+) : RecyclerView.ViewHolder(itemView), ThumbnailHolder {
 
     protected lateinit var model: H
 
     internal var title: TextView = itemView.findViewById(R.id.item_title)
     internal var subtitle: TextView = itemView.findViewById(R.id.item_subtitle)
-    var thumbnail: ImageView = itemView.findViewById(R.id.thumbnail)
+    override val thumbnail: ImageView = itemView.findViewById(R.id.thumbnail)
 
     open val isThumbnail: Boolean
         get() = true
@@ -63,12 +61,12 @@ open class ModelCardViewHolder<H : RemoteImage, T : InteractiveAdapter.AdapterLi
         else load(imageUrl, thumbnail)
     }
 
-    fun withTitle(@StringRes titleRes: Int): ModelCardViewHolder<H, T> {
+    fun withTitle(@StringRes titleRes: Int): ModelCardViewHolder<H> {
         title.setText(titleRes)
         return this
     }
 
-    fun withSubTitle(@StringRes subTitleRes: Int): ModelCardViewHolder<H, T> {
+    fun withSubTitle(@StringRes subTitleRes: Int): ModelCardViewHolder<H> {
         subtitle.setText(subTitleRes)
         return this
     }

@@ -28,9 +28,8 @@ import android.graphics.Typeface
 import android.text.TextUtils
 import android.view.View
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.mainstreetcode.teammate.R
-import com.mainstreetcode.teammate.adapters.GameAdapter
-import com.mainstreetcode.teammate.baseclasses.BaseViewHolder
 import com.mainstreetcode.teammate.model.Game
 import com.mainstreetcode.teammate.util.AppBarListener
 import com.mainstreetcode.teammate.util.THUMBNAIL_SIZE
@@ -41,9 +40,8 @@ import kotlin.math.min
 
 class GameViewHolder(
         itemView: View,
-        adapterListener: GameAdapter.AdapterListener
-) : BaseViewHolder<GameAdapter.AdapterListener>(itemView, adapterListener) {
-
+        delegate: (Game) -> Unit
+) : RecyclerView.ViewHolder(itemView) {
 
     private lateinit var model: Game
 
@@ -59,7 +57,7 @@ class GameViewHolder(
     private val awayThumbnail: CircleImageView = itemView.findViewById(R.id.away_thumbnail)
 
     init {
-        itemView.setOnClickListener { adapterListener.onGameClicked(model) }
+        itemView.setOnClickListener { delegate.invoke(model) }
     }
 
     fun bind(model: Game) {

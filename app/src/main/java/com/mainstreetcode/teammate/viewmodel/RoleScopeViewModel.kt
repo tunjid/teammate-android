@@ -37,21 +37,22 @@ import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
  * ViewModel for checking a role in local contexts
  */
 
-class LocalRoleViewModel : ViewModel() {
+class RoleScopeViewModel : ViewModel() {
 
-    private val role = Role.empty()
+    private val roleMap = mutableMapOf<String, Role>()
 
     private val repository: RoleRepo = RepoProvider.forRepo(RoleRepo::class.java)
 
-    fun hasPrivilegedRole(): Boolean = role.isPrivilegedRole
+    fun hasPrivilegedRole(team: Team): Boolean = roleMap.getOrPut(team.id, Role.Companion::empty).isPrivilegedRole
 
     fun watchRoleChanges(user: User, team: Team): Flowable<Any> = matchInUserRoles(user, team)
-            .map(this::checkChanged)
+            .map { this.checkChanged(it) }
             .filter { flag -> flag }
             .observeOn(mainThread())
             .cast(Any::class.java)
 
     private fun checkChanged(foundRole: Role): Boolean {
+        val role = roleMap.getOrPut(foundRole.team.id, Role.Companion::empty)
         val changed = role.position != foundRole.position
         role.update(foundRole)
         return changed
